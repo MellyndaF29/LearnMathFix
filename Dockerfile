@@ -40,7 +40,7 @@ COPY . .
 RUN composer install --optimize-autoloader --no-dev
 
 # Instal dependensi Node.js & build frontend (Inertia/React/Vite)
-RUN npm install
+RUN npm install --legacy-peer-deps
 RUN npm run build
 
 # Beri hak akses ke folder storage dan cache agar Laravel bisa menulis log/session
