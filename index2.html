@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LearnMathFix — Belajar Matematika, Betulkan Tiap Langkah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16223d;
+    --navy-deep:#0f1830;
+    --paper:#faf6ec;
+    --paper-line:#e4dbc6;
+    --ink:#1c2740;
+    --ink-soft:#4a5573;
+    --gold:#e3ad33;
+    --gold-deep:#c48f1e;
+    --correct:#3f9d67;
+    --correct-bg:#e5f4ea;
+    --wrong:#d9603f;
+    --wrong-bg:#fbe8e1;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Work Sans',sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+    background-size:28px 28px;
+  }
+  h1,h2,h3,.brand{font-family:'Fraunces',serif;}
+  a{color:inherit;}
+
+  header{
+    position:sticky;top:0;z-index:50;
+    background:var(--navy);
+    border-bottom:4px solid var(--gold);
+  }
+  .nav-inner{
+    max-width:1120px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 24px;
+  }
+  .brand{color:var(--paper);font-size:1.3rem;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:10px;}
+  .brand-mark{
+    width:34px;height:34px;border-radius:9px;background:var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--navy-deep);font-weight:700;font-family:'Fraunces',serif;font-size:1.1rem;
+    transform:rotate(-6deg);
+  }
+  nav.links{display:flex;gap:6px;}
+  nav.links button{
+    background:none;border:none;color:#cdd6ee;font-family:'Work Sans',sans-serif;
+    font-size:.95rem;font-weight:600;padding:9px 14px;border-radius:8px;cursor:pointer;
+    transition:background .15s, color .15s;
+  }
+  nav.links button:hover{background:rgba(255,255,255,.08);color:#fff;}
+  nav.links button.active{background:var(--gold);color:var(--navy-deep);}
+
+  .user-box{display:flex;align-items:center;gap:12px;}
+  .user-chip{color:#e7ecfb;font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .user-avatar{
+    width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--navy-deep);
+    display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:.85rem;
+  }
+  .logout-btn{
+    background:none;border:1px solid #3a4772;color:#cdd6ee;font-size:.85rem;font-weight:600;
+    padding:7px 12px;border-radius:8px;cursor:pointer;font-family:'Work Sans',sans-serif;
+  }
+  .logout-btn:hover{background:rgba(255,255,255,.08);}
+
+  main{max-width:1120px;margin:0 auto;padding:0 24px 90px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .hero{padding:72px 0 48px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;}
+  .hero h1{font-size:clamp(2.4rem,5vw,3.6rem);line-height:1.05;margin:0 0 18px;color:var(--navy);font-weight:700;}
+  .hero p{font-size:1.1rem;color:var(--ink-soft);max-width:46ch;margin:0 0 28px;}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn{display:inline-block;padding:13px 24px;border-radius:10px;font-weight:600;font-size:.98rem;text-decoration:none;border:2px solid transparent;cursor:pointer;font-family:'Work Sans',sans-serif;}
+  .btn-primary{background:var(--navy);color:var(--paper);}
+  .btn-primary:hover{background:var(--navy-deep);}
+  .btn-gold{background:var(--gold);color:var(--navy-deep);}
+  .btn-gold:hover{background:var(--gold-deep);}
+  .btn-outline{background:transparent;border-color:var(--navy);color:var(--navy);}
+  .btn-outline:hover{background:var(--navy);color:var(--paper);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .hero-card{background:var(--navy);border-radius:20px;padding:30px;color:var(--paper);position:relative;overflow:hidden;}
+  .hero-card::after{content:"";position:absolute;right:-40px;bottom:-40px;width:160px;height:160px;border-radius:50%;background:var(--gold);opacity:.18;}
+  .hero-eq{font-family:'Fraunces',serif;font-size:1.4rem;opacity:.9;margin:0 0 6px;}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px;}
+  .stat b{display:block;font-family:'Fraunces',serif;font-size:1.8rem;color:var(--gold);}
+  .stat span{font-size:.85rem;color:#c3cbe4;}
+
+  section.block{padding:56px 0;border-top:1px solid var(--paper-line);}
+  .block-head{margin-bottom:32px;}
+  .block-head h2{font-size:1.9rem;margin:0 0 8px;color:var(--navy);}
+  .block-head p{color:var(--ink-soft);margin:0;max-width:60ch;}
+
+  .breadcrumb{
+    display:flex;align-items:center;gap:8px;color:var(--ink-soft);font-size:.9rem;
+    margin-bottom:18px;cursor:pointer;font-weight:600;
+  }
+  .breadcrumb:hover{color:var(--navy);}
+
+  /* ---------- PETA BELAJAR (bagian) ---------- */
+  .path{position:relative;display:flex;flex-direction:column;gap:0;}
+  .bagian-card{
+    display:grid;grid-template-columns:64px 1fr auto;gap:20px;align-items:center;
+    background:#fff;border:1px solid var(--paper-line);border-radius:var(--radius);
+    padding:22px 24px;position:relative;margin-bottom:22px;
+  }
+  .path::before{
+    content:none;
+  }
+  .bagian-card:not(:last-child)::after{
+    content:"";position:absolute;left:32px;bottom:-22px;width:2px;height:22px;
+    background:repeating-linear-gradient(var(--paper-line) 0 4px, transparent 4px 8px);
+  }
+  .bagian-num{
+    width:52px;height:52px;border-radius:14px;background:var(--navy);color:var(--gold);
+    display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;
+    font-weight:700;font-size:1.4rem;transform:rotate(-4deg);
+  }
+  .bagian-card.locked .bagian-num{background:#cfd6e6;color:#8892ab;}
+  .bagian-info h3{margin:0 0 4px;font-size:1.2rem;color:var(--navy);}
+  .bagian-info p{margin:0 0 8px;color:var(--ink-soft);font-size:.92rem;}
+  .bagian-progress{display:flex;gap:6px;}
+  .prog-dot{width:9px;height:9px;border-radius:50%;background:var(--paper-line);}
+  .prog-dot.done{background:var(--correct);}
+  .bagian-status{font-size:.78rem;font-weight:700;color:var(--gold-deep);}
+  .bagian-card.locked .bagian-status{color:#8892ab;}
+  .bagian-card.locked{opacity:.7;}
+
+  /* ---------- BUKU FLIP (per bagian) ---------- */
+  .book{
+    background:#fff;border-radius:18px;border:1px solid var(--paper-line);
+    min-height:420px;display:flex;flex-direction:column;
+    box-shadow:0 14px 30px rgba(22,34,61,.06);
+  }
+  .book-head{padding:24px 34px 0;}
+  .book-head .eyebrow-top{color:var(--gold-deep);font-weight:700;font-size:.85rem;}
+  .book-head h2{margin:4px 0 0;color:var(--navy);font-size:1.6rem;}
+  .book-page{padding:20px 38px 34px;flex:1;}
+  .book-page .eyebrow{color:var(--gold-deep);font-weight:700;font-size:.85rem;margin-bottom:6px;}
+  .book-page h3{margin:0 0 14px;font-size:1.4rem;color:var(--navy);}
+  .book-page p{color:var(--ink-soft);line-height:1.65;margin:0 0 14px;}
+  .book-page .example{
+    background:var(--paper);border-left:4px solid var(--gold);padding:14px 18px;border-radius:0 8px 8px 0;
+    margin-top:16px;font-family:'Fraunces',serif;font-size:1.05rem;color:var(--navy);
+  }
+  .book-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-top:1px solid var(--paper-line);}
+  .page-dots{display:flex;gap:6px;}
+  .page-dots span{width:7px;height:7px;border-radius:50%;background:var(--paper-line);}
+  .page-dots span.on{background:var(--gold);}
+  .book-nav-btn{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:600;font-family:'Work Sans',sans-serif;}
+  .book-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+  /* ---------- KUIS: level select (per bagian) ---------- */
+  .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .level-card{background:#fff;border:1px solid var(--paper-line);border-radius:var(--radius);padding:24px;position:relative;}
+  .level-num{
+    width:40px;height:40px;border-radius:10px;background:var(--navy);color:var(--gold);
+    display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;
+    font-weight:700;margin-bottom:14px;transform:rotate(-4deg);
+  }
+  .level-card h3{margin:0 0 6px;font-size:1.15rem;color:var(--navy);}
+  .level-card p{margin:0 0 16px;color:var(--ink-soft);font-size:.9rem;}
+  .level-best{font-size:.8rem;color:var(--correct);font-weight:600;margin-bottom:12px;min-height:16px;}
+  .level-locked{filter:grayscale(.5);opacity:.6;}
+  .lock-badge{
+    position:absolute;top:20px;right:20px;font-size:.75rem;color:var(--ink-soft);
+    background:var(--paper);padding:3px 9px;border-radius:20px;border:1px solid var(--paper-line);
+  }
+
+  /* ---------- KUIS: playing ---------- */
+  .quiz-wrap{background:#fff;border:1px solid var(--paper-line);border-radius:18px;padding:32px;}
+  .quiz-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .quiz-progress{flex:1;height:8px;background:var(--paper);border-radius:8px;margin:0 18px;overflow:hidden;}
+  .quiz-progress-fill{height:100%;background:var(--gold);width:0%;transition:width .3s;}
+  .quiz-score{font-weight:700;color:var(--navy);font-family:'Fraunces',serif;}
+  .quiz-q{font-size:1.3rem;color:var(--navy);margin:0 0 22px;line-height:1.4;}
+  .options{display:grid;gap:12px;}
+  .opt{
+    text-align:left;padding:14px 18px;border:2px solid var(--paper-line);border-radius:10px;
+    background:var(--paper);cursor:pointer;font-family:'Work Sans',sans-serif;font-size:1rem;color:var(--ink);
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover:not(:disabled){border-color:var(--gold);}
+  .opt:disabled{cursor:default;}
+  .opt.correct-pick{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.wrong-pick{border-color:var(--wrong);background:var(--wrong-bg);}
+  .opt.reveal-correct{border-color:var(--correct);background:var(--correct-bg);}
+
+  .feedback{margin-top:20px;padding:16px 18px;border-radius:10px;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--correct-bg);border:1px solid var(--correct);}
+  .feedback.no{background:var(--wrong-bg);border:1px solid var(--wrong);}
+  .feedback b{display:block;margin-bottom:4px;font-family:'Fraunces',serif;font-size:1.05rem;}
+  .feedback.ok b{color:var(--correct);}
+  .feedback.no b{color:var(--wrong);}
+  .feedback p{margin:0;color:var(--ink-soft);font-size:.92rem;line-height:1.5;}
+  .quiz-actions{display:flex;justify-content:flex-end;margin-top:22px;}
+
+  .result-score{text-align:center;padding:20px 0 10px;}
+  .result-score b{font-family:'Fraunces',serif;font-size:3rem;color:var(--navy);display:block;}
+  .result-score span{color:var(--ink-soft);}
+  .result-banner{
+    text-align:center;background:var(--correct-bg);border:1px solid var(--correct);color:var(--correct);
+    padding:12px 16px;border-radius:10px;margin:14px 0 0;font-weight:600;display:none;
+  }
+  .result-banner.show{display:block;}
+  .review-item{border:1px solid var(--paper-line);border-radius:10px;padding:16px 18px;margin-bottom:12px;}
+  .review-item.was-wrong{border-color:var(--wrong);background:var(--wrong-bg);}
+  .review-item .q{font-weight:600;color:var(--navy);margin-bottom:6px;}
+  .review-item .fix{font-size:.9rem;color:var(--ink-soft);}
+  .result-actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;}
+
+  footer{background:var(--navy);color:#c3cbe4;text-align:center;padding:26px;font-size:.85rem;}
+
+  /* ---------- LOGIN ---------- */
+  .login-wrap{min-height:calc(100vh - 90px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+  .login-grid{
+    display:grid;grid-template-columns:1fr 1fr;max-width:920px;width:100%;
+    background:#fff;border-radius:20px;overflow:hidden;border:1px solid var(--paper-line);
+    box-shadow:0 20px 46px rgba(22,34,61,.12);
+  }
+  .login-side{background:var(--navy);color:var(--paper);padding:44px 38px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
+  .login-side::after{content:"";position:absolute;left:-50px;top:-50px;width:180px;height:180px;border-radius:50%;background:var(--gold);opacity:.16;}
+  .login-side .brand-mark{margin-bottom:18px;}
+  .login-side h2{font-size:1.7rem;margin:0 0 12px;line-height:1.2;}
+  .login-side p{color:#c3cbe4;font-size:.95rem;line-height:1.6;margin:0;}
+  .login-form-side{padding:44px 38px;}
+  .login-form-side h3{margin:0 0 6px;color:var(--navy);font-size:1.4rem;}
+  .login-form-side .sub{color:var(--ink-soft);font-size:.92rem;margin:0 0 26px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
+  .field input{width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid var(--paper-line);font-family:'Work Sans',sans-serif;font-size:.95rem;background:var(--paper);color:var(--ink);}
+  .field input:focus{outline:none;border-color:var(--gold);}
+  .login-error{display:none;background:var(--wrong-bg);border:1px solid var(--wrong);color:var(--wrong);padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:14px;}
+  .login-error.show{display:block;}
+  .login-submit{width:100%;margin-top:6px;}
+  .login-note{font-size:.8rem;color:var(--ink-soft);margin-top:16px;text-align:center;}
+
+  @media (max-width:820px){
+    .hero{grid-template-columns:1fr;}
+    .level-grid{grid-template-columns:1fr;}
+    .bagian-card{grid-template-columns:44px 1fr;}
+    .bagian-card > .btn{grid-column:1 / -1;}
+    nav.links{display:none;}
+  }
+  @media (max-width:720px){
+    .login-grid{grid-template-columns:1fr;}
+    .login-side{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <div class="brand"><span class="brand-mark">√x</span>LearnMathFix</div>
+    <nav class="links" id="mainNav" style="display:none;">
+      <button data-view="home" class="active">Beranda</button>
+      <button data-view="bagian-list">Peta Belajar</button>
+    </nav>
+    <div class="user-box" id="userBox" style="display:none;">
+      <span class="user-chip"><span class="user-avatar" id="userAvatar">?</span><span id="userName"></span></span>
+      <button class="logout-btn" onclick="logout()">Keluar</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ LOGIN ============ -->
+  <section id="view-login" class="view active">
+    <div class="login-wrap">
+      <div class="login-grid">
+        <div class="login-side">
+          <span class="brand-mark">√x</span>
+          <h2>Masuk dulu, baru mulai belajar.</h2>
+          <p>Login membantu LearnMathFix menyimpan progres tiap bagian dan level kuis di perangkat ini, jadi kamu bisa lanjut kapan saja tanpa mengulang dari awal.</p>
+        </div>
+        <div class="login-form-side">
+          <h3>Masuk ke LearnMathFix</h3>
+          <p class="sub">Isi namamu dan email untuk mulai belajar.</p>
+          <div class="login-error" id="loginError">Nama dan email wajib diisi ya.</div>
+          <form id="loginForm" novalidate onsubmit="return handleLogin(event)">
+            <div class="field">
+              <label for="loginName">Nama</label>
+              <input type="text" id="loginName" placeholder="Nama kamu" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" placeholder="nama@email.com" autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="loginPassword">Kata sandi</label>
+              <input type="password" id="loginPassword" placeholder="Minimal 4 karakter" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-gold login-submit">Masuk & Mulai Belajar</button>
+          </form>
+          <p class="login-note">Demo lokal: data disimpan di peramban ini saja, belum terhubung ke server sungguhan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOME ============ -->
+  <section id="view-home" class="view">
+    <div class="hero">
+      <div>
+        <h1>Setiap kesalahan itu langkah, bukan akhir.</h1>
+        <p>LearnMathFix mengajakmu belajar satu bagian penuh dulu lewat buku interaktif, baru lanjut mengerjakan kuis berlevel dari bagian itu. Kalau jawabanmu keliru, langsung ada pembenarannya sebelum lanjut ke bagian berikutnya.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="showView('bagian-list')">Lihat Peta Belajar</button>
+        </div>
+      </div>
+      <div class="hero-card">
+        <p class="hero-eq">Bagian 1 → Kuis Bagian 1</p>
+        <p class="hero-eq" style="opacity:.6;font-size:1.1rem;">Bagian 2 → Kuis Bagian 2 → ...</p>
+        <div class="hero-stats">
+          <div class="stat"><b>3</b><span>bagian belajar</span></div>
+          <div class="stat"><b>3</b><span>level kuis per bagian</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PETA BELAJAR (daftar bagian) ============ -->
+  <section id="view-bagian-list" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="block-head">
+        <h2>Peta Belajar</h2>
+        <p>Selesaikan buku dan kuis Bagian 1 dulu sampai lulus, baru Bagian 2 terbuka. Begitu seterusnya.</p>
+      </div>
+      <div class="path" id="bagianGrid"></div>
+    </section>
+  </section>
+
+  <!-- ============ BUKU (per bagian) ============ -->
+  <section id="view-book" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="breadcrumb" onclick="showView('bagian-list')">← Kembali ke Peta Belajar</div>
+      <div class="book">
+        <div class="book-head">
+          <div class="eyebrow-top" id="bookEyebrow"></div>
+          <h2 id="bookTitle"></h2>
+        </div>
+        <div class="book-page" id="bookPage"></div>
+        <div class="book-footer">
+          <button class="book-nav-btn" id="prevPageBtn" onclick="turnPage(-1)">← Sebelumnya</button>
+          <div class="page-dots" id="pageDots"></div>
+          <button class="book-nav-btn" id="nextPageBtn" onclick="turnPage(1)">Berikutnya →</button>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ KUIS: PILIH LEVEL (per bagian) ============ -->
+  <section id="view-quiz-home" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="breadcrumb" onclick="showView('book')">← Kembali ke Buku Bagian Ini</div>
+      <div class="block-head">
+        <h2 id="quizHomeTitle">Kuis Bagian</h2>
+        <p>Selesaikan level 1 dulu untuk membuka level berikutnya. Nilai minimal 60% untuk lulus tiap level.</p>
+      </div>
+      <div class="level-grid" id="levelGrid"></div>
+    </section>
+  </section>
+
+  <!-- ============ KUIS: SEDANG BERMAIN ============ -->
+  <section id="view-quiz-play" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="quiz-wrap">
+        <div class="quiz-top">
+          <span id="quizLevelLabel" style="font-weight:600;color:var(--ink-soft);"></span>
+          <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+          <span class="quiz-score" id="quizScoreLabel">Skor: 0</span>
+        </div>
+        <p class="quiz-q" id="quizQuestion"></p>
+        <div class="options" id="quizOptions"></div>
+        <div class="feedback" id="quizFeedback">
+          <b id="feedbackTitle"></b>
+          <p id="feedbackText"></p>
+        </div>
+        <div class="quiz-actions">
+          <button class="btn btn-primary" id="quizNextBtn" style="display:none;" onclick="nextQuestion()">Lanjut →</button>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ KUIS: HASIL ============ -->
+  <section id="view-quiz-result" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="quiz-wrap">
+        <div class="result-score">
+          <b id="resultScore">0/0</b>
+          <span id="resultMsg">jawaban benar</span>
+        </div>
+        <div class="result-banner" id="resultBanner"></div>
+        <h3 style="color:var(--navy);margin:26px 0 14px;">Pembenaran soal yang keliru</h3>
+        <div id="reviewList"></div>
+        <div id="noMistakes" style="display:none;color:var(--ink-soft);">Mantap, tidak ada yang perlu dibenarkan di level ini!</div>
+        <div class="result-actions" id="resultActions"></div>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<footer>LearnMathFix — belajar matematika, betulkan tiap langkah keliru.</footer>
+
+<script>
+/* ================= PENYIMPANAN AMAN (fallback jika localStorage diblokir) ================= */
+const memoryStore = {};
+function safeGet(key){
+  try { return localStorage.getItem(key); }
+  catch(e){ return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null; }
+}
+function safeSet(key, value){
+  try { localStorage.setItem(key, value); }
+  catch(e){ memoryStore[key] = value; }
+}
+function safeRemove(key){
+  try { localStorage.removeItem(key); }
+  catch(e){ delete memoryStore[key]; }
+}
+
+/* ================= NAVIGASI ANTAR VIEW ================= */
+function showView(name){
+  if(name !== 'login' && !isLoggedIn()){
+    name = 'login';
+  }
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('nav.links button').forEach(b=>b.classList.remove('active'));
+  const navMap = {home:'home', 'bagian-list':'bagian-list', book:'bagian-list', 'quiz-home':'bagian-list', 'quiz-play':'bagian-list', 'quiz-result':'bagian-list'};
+  if(navMap[name]){
+    const target = document.querySelector(`nav.links button[data-view="${navMap[name]}"]`);
+    if(target) target.classList.add('active');
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('nav.links button').forEach(btn=>{
+  btn.addEventListener('click', ()=>showView(btn.dataset.view));
+});
+
+/* ================= LOGIN GATE ================= */
+function isLoggedIn(){
+  return safeGet('lmf_logged_in') === '1';
+}
+function handleLogin(e){
+  e.preventDefault();
+  const name = document.getElementById('loginName').value.trim();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const err = document.getElementById('loginError');
+  if(!name || !email || password.length < 4){
+    err.textContent = !name || !email ? 'Nama dan email wajib diisi ya.' : 'Kata sandi minimal 4 karakter.';
+    err.classList.add('show');
+    return false;
+  }
+  err.classList.remove('show');
+  safeSet('lmf_logged_in', '1');
+  safeSet('lmf_user_name', name);
+  applyLoggedInUI();
+  showView('home');
+  return false;
+}
+function logout(){
+  safeRemove('lmf_logged_in');
+  document.getElementById('mainNav').style.display = 'none';
+  document.getElementById('userBox').style.display = 'none';
+  document.getElementById('loginForm').reset();
+  showView('login');
+}
+function applyLoggedInUI(){
+  const name = safeGet('lmf_user_name') || 'Pelajar';
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userAvatar').textContent = name.trim().charAt(0).toUpperCase() || '?';
+  document.getElementById('mainNav').style.display = 'flex';
+  document.getElementById('userBox').style.display = 'flex';
+}
+
+/* ================= DATA: BAGIAN (buku + kuis berlevel per bagian) ================= */
+const bagianList = [
+  {
+    id:1, title:'Bagian 1: Pecahan', desc:'Konsep dasar pecahan sampai operasi hitungnya',
+    pages:[
+      {eyebrow:'Konsep', title:'Apa itu pecahan?', body:'Pecahan menunjukkan bagian dari suatu keseluruhan. Pecahan ditulis sebagai a/b, di mana a disebut pembilang dan b disebut penyebut.', example:'3/4 artinya 3 bagian dari 4 bagian yang sama besar.'},
+      {eyebrow:'Konsep', title:'Menyamakan penyebut', body:'Untuk menjumlahkan atau mengurangkan pecahan, penyebutnya harus sama dulu. Caranya, cari KPK dari kedua penyebut.', example:'1/2 + 1/3 = 3/6 + 2/6 = 5/6'},
+      {eyebrow:'Konsep', title:'Perkalian dan pembagian pecahan', body:'Perkalian pecahan: kalikan pembilang dengan pembilang, penyebut dengan penyebut. Pembagian pecahan: kalikan dengan kebalikan pecahan pembaginya.', example:'2/3 × 3/5 = 6/15 = 2/5,  4/5 ÷ 2/5 = 4/5 × 5/2 = 2'},
+      {eyebrow:'Latihan Konsep', title:'Menyelesaikan soal cerita pecahan', body:'Soal cerita pecahan biasanya minta kamu mengubah kalimat jadi operasi pecahan, lalu menghitungnya seperti biasa.', example:'Ibu punya 3/4 kg tepung, dipakai 1/4 kg. Sisa = 3/4 − 1/4 = 2/4 = 1/2 kg.'}
+    ],
+    levels:[
+      {id:1, name:'Level 1 — Dasar', questions:[
+        {q:'1/2 + 1/4 = ?', options:['2/6','3/4','2/4','1/4'], correct:1, explain:'Samakan penyebut jadi 4: 1/2 = 2/4. Jadi 2/4 + 1/4 = 3/4.'},
+        {q:'Bentuk paling sederhana dari 6/8 adalah?', options:['3/4','2/3','6/8','4/6'], correct:0, explain:'Bagi pembilang dan penyebut dengan FPB-nya, yaitu 2: 6/8 = 3/4.'},
+        {q:'2/3 dari 9 adalah?', options:['3','6','9','12'], correct:1, explain:'2/3 × 9 = 18/3 = 6.'},
+        {q:'3/5 + 1/5 = ?', options:['4/10','4/5','3/10','1/5'], correct:1, explain:'Penyebut sudah sama, tinggal jumlahkan pembilangnya: 3/5 + 1/5 = 4/5.'}
+      ]},
+      {id:2, name:'Level 2 — Menengah', questions:[
+        {q:'2/3 × 3/5 = ?', options:['5/8','6/15','2/5','6/8'], correct:2, explain:'Kalikan pembilang dengan pembilang, penyebut dengan penyebut: 2×3=6, 3×5=15 → 6/15, disederhanakan jadi 2/5.'},
+        {q:'4/5 ÷ 2/5 = ?', options:['2','8/25','2/5','1/2'], correct:0, explain:'Pembagian pecahan: kalikan dengan kebalikannya: 4/5 × 5/2 = 20/10 = 2.'},
+        {q:'1/2 × 4 = ?', options:['1','2','4','8'], correct:1, explain:'1/2 × 4 = 4/2 = 2.'},
+        {q:'3/4 ÷ 1/2 = ?', options:['3/8','1 1/2','2/3','3/2 saja tanpa disederhanakan'], correct:1, explain:'3/4 × 2/1 = 6/4 = 1 1/2 (satu setengah).'}
+      ]},
+      {id:3, name:'Level 3 — Lanjutan', questions:[
+        {q:'Ibu punya 3/4 kg tepung, dipakai 1/4 kg. Sisa tepung Ibu?', options:['1/4 kg','1/2 kg','2/4 kg saja','1 kg'], correct:1, explain:'3/4 − 1/4 = 2/4, yang jika disederhanakan menjadi 1/2 kg.'},
+        {q:'Jika 2/5 dari uang Rian adalah Rp20.000, berapa total uang Rian?', options:['Rp40.000','Rp50.000','Rp8.000','Rp100.000'], correct:1, explain:'2/5 × total = 20.000, maka total = 20.000 ÷ 2/5 = 20.000 × 5/2 = Rp50.000.'},
+        {q:'1/2 + 1/3 − 1/6 = ?', options:['1/3','2/3','5/6','1/6'], correct:1, explain:'Samakan penyebut jadi 6: 3/6 + 2/6 − 1/6 = 4/6 = 2/3.'},
+        {q:'Pecahan manakah yang senilai dengan 3/6?', options:['1/3','2/3','1/2','3/4'], correct:2, explain:'3/6 disederhanakan dengan membagi 3: 3/6 = 1/2.'}
+      ]}
+    ]
+  },
+  {
+    id:2, title:'Bagian 2: Aljabar Dasar', desc:'Variabel, persamaan, dan faktorisasi sederhana',
+    pages:[
+      {eyebrow:'Konsep', title:'Apa itu variabel?', body:'Variabel adalah simbol (biasanya huruf) yang mewakili nilai yang belum diketahui atau bisa berubah-ubah.', example:'Pada 2x + 3 = 9, x adalah variabel yang nilainya belum diketahui.'},
+      {eyebrow:'Konsep', title:'Menyelesaikan persamaan linear', body:'Untuk mencari nilai x, pindahkan angka ke satu sisi dan variabel ke sisi lain, lalu sederhanakan.', example:'2x + 3 = 9 → 2x = 6 → x = 3'},
+      {eyebrow:'Konsep', title:'Persamaan dua langkah', body:'Kadang variabel muncul di kedua ruas. Kumpulkan dulu semua suku variabel di satu ruas, dan angka di ruas lain.', example:'3x + 5 = 2x + 9 → 3x − 2x = 9 − 5 → x = 4'},
+      {eyebrow:'Latihan Konsep', title:'Faktorisasi sederhana', body:'Faktorisasi mengubah bentuk penjumlahan menjadi perkalian, memudahkan mencari akar persamaan kuadrat.', example:'x² − 5x + 6 = (x − 2)(x − 3)'}
+    ],
+    levels:[
+      {id:1, name:'Level 1 — Dasar', questions:[
+        {q:'Jika 2x + 3 = 9, maka x = ?', options:['2','3','4','6'], correct:1, explain:'2x = 9 − 3 = 6, sehingga x = 6 ÷ 2 = 3.'},
+        {q:'Jika y − 5 = 12, maka y = ?', options:['7','17','60','−7'], correct:1, explain:'Pindahkan −5 ke ruas kanan menjadi +5: y = 12 + 5 = 17.'},
+        {q:'Jika 4x = 20, maka x = ?', options:['4','5','16','24'], correct:1, explain:'x = 20 ÷ 4 = 5.'},
+        {q:'Bentuk sederhana dari 3x + 2x adalah?', options:['5x','6x','x²','5x²'], correct:0, explain:'Suku sejenis dijumlahkan langsung koefisiennya: 3x + 2x = 5x.'}
+      ]},
+      {id:2, name:'Level 2 — Menengah', questions:[
+        {q:'Jika 3x + 5 = 2x + 9, maka x = ?', options:['2','4','14','−4'], correct:1, explain:'Kumpulkan variabel: 3x − 2x = 9 − 5 → x = 4.'},
+        {q:'Jika 2(x + 3) = 16, maka x = ?', options:['5','8','10','13'], correct:0, explain:'Sebar dulu: 2x + 6 = 16 → 2x = 10 → x = 5.'},
+        {q:'Jika 5x − 4 = 2x + 11, maka x = ?', options:['5','3','7','15'], correct:0, explain:'5x − 2x = 11 + 4 → 3x = 15 → x = 5.'},
+        {q:'Jika x/2 + 3 = 7, maka x = ?', options:['4','6','8','10'], correct:2, explain:'x/2 = 7 − 3 = 4, sehingga x = 4 × 2 = 8.'}
+      ]},
+      {id:3, name:'Level 3 — Lanjutan', questions:[
+        {q:'Hasil faktorisasi x² − 5x + 6 adalah?', options:['(x−1)(x−6)','(x−2)(x−3)','(x+2)(x+3)','(x−6)(x+1)'], correct:1, explain:'Cari dua angka yang jika dikalikan = 6 dan dijumlah = −5, yaitu −2 dan −3: (x−2)(x−3).'},
+        {q:'Akar dari persamaan x² − 9 = 0 adalah?', options:['x = 3 atau x = −3','x = 9','x = 3 saja','x = −9'], correct:0, explain:'x² = 9, sehingga x = 3 atau x = −3, karena kedua nilai jika dikuadratkan hasilnya 9.'},
+        {q:'Akar dari persamaan x² + 2x = 0 adalah?', options:['x = 0 atau x = −2','x = 0 saja','x = 2 atau x = −2','x = 2 saja'], correct:0, explain:'Faktorkan: x(x + 2) = 0, sehingga x = 0 atau x = −2.'},
+        {q:'Jika 2x² − 8 = 0, maka nilai x adalah?', options:['x = 4 atau x = −4','x = 2 atau x = −2','x = 16','x = 2 saja'], correct:1, explain:'2x² = 8 → x² = 4 → x = 2 atau x = −2.'}
+      ]}
+    ]
+  },
+  {
+    id:3, title:'Bagian 3: Bangun Datar', desc:'Luas, keliling, hingga volume bangun ruang sederhana',
+    pages:[
+      {eyebrow:'Konsep', title:'Luas dan keliling persegi panjang', body:'Luas persegi panjang = panjang × lebar. Keliling persegi panjang = 2 × (panjang + lebar).', example:'Panjang 8 cm, lebar 5 cm → Luas = 8 × 5 = 40 cm², Keliling = 2 × (8+5) = 26 cm'},
+      {eyebrow:'Konsep', title:'Lingkaran dan segitiga', body:'Keliling lingkaran = 2πr. Luas lingkaran = πr². Luas segitiga = ½ × alas × tinggi.', example:'r = 7 cm → Keliling = 2 × 22/7 × 7 = 44 cm. Alas 10, tinggi 6 → Luas segitiga = ½ × 10 × 6 = 30 cm²'},
+      {eyebrow:'Konsep', title:'Bangun ruang: volume', body:'Volume kubus = rusuk³. Volume balok = panjang × lebar × tinggi.', example:'Kubus rusuk 4 cm → Volume = 4³ = 64 cm³'},
+      {eyebrow:'Latihan Konsep', title:'Soal cerita bangun datar', body:'Soal cerita biasanya menyembunyikan rumus di balik cerita — kenali dulu bangun apa yang dimaksud sebelum menghitung.', example:'Taman berbentuk lingkaran jari-jari 21 m, luas = 22/7 × 21 × 21 = 1.386 m²'}
+    ],
+    levels:[
+      {id:1, name:'Level 1 — Dasar', questions:[
+        {q:'Luas persegi panjang dengan panjang 8 cm dan lebar 5 cm adalah?', options:['13 cm²','26 cm²','40 cm²','45 cm²'], correct:2, explain:'Luas = panjang × lebar = 8 × 5 = 40 cm².'},
+        {q:'Keliling persegi dengan sisi 6 cm adalah?', options:['12 cm','24 cm','36 cm','6 cm'], correct:1, explain:'Keliling persegi = 4 × sisi = 4 × 6 = 24 cm.'},
+        {q:'Luas persegi dengan sisi 7 cm adalah?', options:['14 cm²','28 cm²','49 cm²','21 cm²'], correct:2, explain:'Luas persegi = sisi × sisi = 7 × 7 = 49 cm².'},
+        {q:'Keliling persegi panjang dengan panjang 10 cm dan lebar 4 cm adalah?', options:['14 cm','28 cm','40 cm','24 cm'], correct:1, explain:'Keliling = 2 × (panjang + lebar) = 2 × (10+4) = 28 cm.'}
+      ]},
+      {id:2, name:'Level 2 — Menengah', questions:[
+        {q:'Keliling lingkaran dengan jari-jari 7 cm (π = 22/7) adalah?', options:['22 cm','44 cm','154 cm','14 cm'], correct:1, explain:'Keliling = 2πr = 2 × 22/7 × 7 = 44 cm.'},
+        {q:'Luas segitiga dengan alas 10 cm dan tinggi 6 cm adalah?', options:['16 cm²','30 cm²','60 cm²','36 cm²'], correct:1, explain:'Luas = ½ × alas × tinggi = ½ × 10 × 6 = 30 cm².'},
+        {q:'Luas lingkaran dengan jari-jari 14 cm (π = 22/7) adalah?', options:['44 cm²','88 cm²','616 cm²','308 cm²'], correct:2, explain:'Luas = πr² = 22/7 × 14 × 14 = 616 cm².'},
+        {q:'Luas segitiga dengan alas 12 cm dan tinggi 5 cm adalah?', options:['60 cm²','30 cm²','17 cm²','120 cm²'], correct:1, explain:'Luas = ½ × 12 × 5 = 30 cm².'}
+      ]},
+      {id:3, name:'Level 3 — Lanjutan', questions:[
+        {q:'Sebuah kubus memiliki rusuk 4 cm. Volumenya adalah?', options:['12 cm³','16 cm³','48 cm³','64 cm³'], correct:3, explain:'Volume kubus = rusuk³ = 4 × 4 × 4 = 64 cm³.'},
+        {q:'Volume balok dengan panjang 5 cm, lebar 4 cm, tinggi 3 cm adalah?', options:['12 cm³','60 cm³','35 cm³','20 cm³'], correct:1, explain:'Volume balok = p × l × t = 5 × 4 × 3 = 60 cm³.'},
+        {q:'Luas permukaan kubus dengan rusuk 3 cm adalah?', options:['9 cm²','18 cm²','27 cm²','54 cm²'], correct:3, explain:'Luas permukaan kubus = 6 × sisi² = 6 × 9 = 54 cm².'},
+        {q:'Taman berbentuk lingkaran berjari-jari 21 m (π = 22/7). Luas taman tersebut?', options:['132 m²','462 m²','1.386 m²','924 m²'], correct:2, explain:'Luas = πr² = 22/7 × 21 × 21 = 1.386 m².'}
+      ]}
+    ]
+  }
+];
+
+let activeBagianIndex = 0;
+let currentPage = 0;
+let activeLevelIndex = 0;
+let qIndex = 0;
+let score = 0;
+let answered = false;
+let wrongLog = [];
+
+/* ================= PROGRES: helper skor & kunci ================= */
+function levelBest(bagianId, levelId){
+  return Number(safeGet(`lmf_best_${bagianId}_${levelId}`) || 0);
+}
+function setLevelBest(bagianId, levelId, pct){
+  const cur = levelBest(bagianId, levelId);
+  if(pct > cur) safeSet(`lmf_best_${bagianId}_${levelId}`, pct);
+}
+function isBagianComplete(bagianIndex){
+  const b = bagianList[bagianIndex];
+  const lastLevel = b.levels[b.levels.length - 1];
+  return levelBest(b.id, lastLevel.id) >= 60;
+}
+function isBagianUnlocked(bagianIndex){
+  if(bagianIndex === 0) return true;
+  return isBagianComplete(bagianIndex - 1);
+}
+function isLevelUnlocked(bagianIndex, levelIndex){
+  if(levelIndex === 0) return true;
+  const b = bagianList[bagianIndex];
+  return levelBest(b.id, b.levels[levelIndex-1].id) >= 60;
+}
+function bagianDoneCount(bagianIndex){
+  const b = bagianList[bagianIndex];
+  return b.levels.filter(lv => levelBest(b.id, lv.id) >= 60).length;
+}
+
+/* ================= PETA BELAJAR ================= */
+function renderBagianGrid(){
+  const grid = document.getElementById('bagianGrid');
+  grid.innerHTML = '';
+  bagianList.forEach((b, i)=>{
+    const unlocked = isBagianUnlocked(i);
+    const done = bagianDoneCount(i);
+    const complete = isBagianComplete(i);
+    const card = document.createElement('div');
+    card.className = 'bagian-card' + (unlocked ? '' : ' locked');
+    card.innerHTML = `
+      <div class="bagian-num">${b.id}</div>
+      <div class="bagian-info">
+        <h3>${b.title}</h3>
+        <p>${b.desc}</p>
+        <div class="bagian-progress">
+          ${b.levels.map((_,li)=> `<span class="prog-dot ${li < done ? 'done' : ''}"></span>`).join('')}
+        </div>
+        <div class="bagian-status" style="margin-top:8px;">
+          ${!unlocked ? 'Terkunci — selesaikan bagian sebelumnya' : complete ? 'Selesai' : done > 0 ? `${done}/${b.levels.length} level lulus` : 'Belum dimulai'}
+        </div>
+      </div>
+      <button class="btn ${unlocked ? 'btn-primary' : 'btn-outline'}" ${unlocked ? '' : 'disabled'}>${unlocked ? 'Buka Bagian' : 'Terkunci'}</button>
+    `;
+    if(unlocked){
+      card.querySelector('button').onclick = ()=> openBagian(i);
+    }
+    grid.appendChild(card);
+  });
+}
+
+function openBagian(bagianIndex){
+  activeBagianIndex = bagianIndex;
+  currentPage = 0;
+  showView('book');
+  renderBookPage();
+}
+
+/* ================= BUKU FLIP (per bagian) ================= */
+function renderBookPage(){
+  const bagian = bagianList[activeBagianIndex];
+  const page = bagian.pages[currentPage];
+  const isLastPage = currentPage === bagian.pages.length - 1;
+
+  document.getElementById('bookEyebrow').textContent = bagian.title;
+  document.getElementById('bookTitle').textContent = `Halaman ${currentPage+1} dari ${bagian.pages.length}`;
+  document.getElementById('bookPage').innerHTML = `
+    <div class="eyebrow">${page.eyebrow}</div>
+    <h3>${page.title}</h3>
+    <p>${page.body}</p>
+    <div class="example">${page.example}</div>
+  `;
+  document.getElementById('prevPageBtn').disabled = currentPage === 0;
+
+  const nextBtn = document.getElementById('nextPageBtn');
+  if(isLastPage){
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Lanjut ke Kuis Bagian Ini →';
+    nextBtn.onclick = ()=> openQuizHome(activeBagianIndex);
+  } else {
+    nextBtn.textContent = 'Berikutnya →';
+    nextBtn.onclick = ()=> turnPage(1);
+    nextBtn.disabled = false;
+  }
+
+  const dots = document.getElementById('pageDots');
+  dots.innerHTML = '';
+  bagian.pages.forEach((_, i)=>{
+    const d = document.createElement('span');
+    if(i===currentPage) d.className = 'on';
+    dots.appendChild(d);
+  });
+}
+function turnPage(dir){
+  const bagian = bagianList[activeBagianIndex];
+  const next = currentPage + dir;
+  if(next < 0 || next >= bagian.pages.length) return;
+  currentPage = next;
+  renderBookPage();
+}
+
+/* ================= KUIS: pilih level (per bagian) ================= */
+function openQuizHome(bagianIndex){
+  activeBagianIndex = bagianIndex;
+  showView('quiz-home');
+  renderLevelGrid();
+}
+function renderLevelGrid(){
+  const bagian = bagianList[activeBagianIndex];
+  document.getElementById('quizHomeTitle').textContent = `Kuis ${bagian.title}`;
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = '';
+  bagian.levels.forEach((lvl, i)=>{
+    const unlocked = isLevelUnlocked(activeBagianIndex, i);
+    const best = levelBest(bagian.id, lvl.id);
+    const card = document.createElement('div');
+    card.className = 'level-card' + (unlocked ? '' : ' level-locked');
+    card.innerHTML = `
+      ${unlocked ? '' : '<span class="lock-badge">🔒 Terkunci</span>'}
+      <div class="level-num">${lvl.id}</div>
+      <h3>${lvl.name}</h3>
+      <p>${lvl.questions.length} soal</p>
+      <div class="level-best">${best ? 'Skor terbaik: ' + best + '%' : ''}</div>
+      <button class="btn ${unlocked ? 'btn-primary' : 'btn-outline'}" style="width:100%;" ${unlocked ? '' : 'disabled'}>
+        ${unlocked ? 'Mulai Level' : 'Selesaikan level sebelumnya'}
+      </button>
+    `;
+    if(unlocked){
+      card.querySelector('button').onclick = ()=> startLevel(i);
+    }
+    grid.appendChild(card);
+  });
+}
+
+/* ================= KUIS: bermain ================= */
+function startLevel(levelIndex){
+  activeLevelIndex = levelIndex;
+  qIndex = 0;
+  score = 0;
+  wrongLog = [];
+  showView('quiz-play');
+  renderQuestion();
+}
+function retryLevel(){
+  startLevel(activeLevelIndex);
+}
+function renderQuestion(){
+  answered = false;
+  const bagian = bagianList[activeBagianIndex];
+  const lvl = bagian.levels[activeLevelIndex];
+  const q = lvl.questions[qIndex];
+  document.getElementById('quizLevelLabel').textContent = `${bagian.title} · ${lvl.name}`;
+  document.getElementById('quizScoreLabel').textContent = 'Skor: ' + score;
+  document.getElementById('quizProgressFill').style.width = ((qIndex)/lvl.questions.length*100) + '%';
+  document.getElementById('quizQuestion').textContent = `Soal ${qIndex+1} dari ${lvl.questions.length}: ${q.q}`;
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  q.options.forEach((opt, i)=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = opt;
+    b.onclick = ()=> selectAnswer(i);
+    opts.appendChild(b);
+  });
+  document.getElementById('quizFeedback').className = 'feedback';
+  document.getElementById('quizNextBtn').style.display = 'none';
+}
+function selectAnswer(i){
+  if(answered) return;
+  answered = true;
+  const bagian = bagianList[activeBagianIndex];
+  const lvl = bagian.levels[activeLevelIndex];
+  const q = lvl.questions[qIndex];
+  const buttons = document.querySelectorAll('#quizOptions .opt');
+  buttons.forEach(b=> b.disabled = true);
+
+  const isCorrect = i === q.correct;
+  if(isCorrect){
+    buttons[i].classList.add('correct-pick');
+    score++;
+  } else {
+    buttons[i].classList.add('wrong-pick');
+    buttons[q.correct].classList.add('reveal-correct');
+    wrongLog.push({q: q.q, correctAnswer: q.options[q.correct], explain: q.explain});
+  }
+
+  const fb = document.getElementById('quizFeedback');
+  fb.className = 'feedback show ' + (isCorrect ? 'ok' : 'no');
+  document.getElementById('feedbackTitle').textContent = isCorrect ? 'Benar!' : 'Kurang tepat — ini pembenarannya:';
+  document.getElementById('feedbackText').textContent = isCorrect
+    ? q.explain
+    : `Jawaban yang tepat adalah "${q.options[q.correct]}". ${q.explain}`;
+
+  document.getElementById('quizScoreLabel').textContent = 'Skor: ' + score;
+  document.getElementById('quizProgressFill').style.width = ((qIndex+1)/lvl.questions.length*100) + '%';
+  document.getElementById('quizNextBtn').style.display = 'inline-block';
+  document.getElementById('quizNextBtn').textContent = (qIndex === lvl.questions.length - 1) ? 'Lihat Hasil →' : 'Lanjut →';
+}
+function nextQuestion(){
+  const bagian = bagianList[activeBagianIndex];
+  const lvl = bagian.levels[activeLevelIndex];
+  if(qIndex < lvl.questions.length - 1){
+    qIndex++;
+    renderQuestion();
+  } else {
+    finishLevel();
+  }
+}
+
+/* ================= KUIS: hasil ================= */
+function finishLevel(){
+  const bagian = bagianList[activeBagianIndex];
+  const lvl = bagian.levels[activeLevelIndex];
+  const pct = Math.round((score / lvl.questions.length) * 100);
+  setLevelBest(bagian.id, lvl.id, pct);
+
+  showView('quiz-result');
+  document.getElementById('resultScore').textContent = `${score}/${lvl.questions.length}`;
+  document.getElementById('resultMsg').textContent = pct >= 60
+    ? `jawaban benar (${pct}%) — lulus!`
+    : `jawaban benar (${pct}%) — nilai minimal 60% untuk lulus level ini.`;
+
+  const isLastLevelOfBagian = activeLevelIndex === bagian.levels.length - 1;
+  const bannerEl = document.getElementById('resultBanner');
+  const hasNextBagian = activeBagianIndex < bagianList.length - 1;
+  if(pct >= 60 && isLastLevelOfBagian){
+    bannerEl.className = 'result-banner show';
+    bannerEl.textContent = hasNextBagian
+      ? `${bagian.title} selesai! ${bagianList[activeBagianIndex+1].title} sudah terbuka.`
+      : `${bagian.title} selesai! Kamu sudah menuntaskan semua bagian.`;
+  } else {
+    bannerEl.className = 'result-banner';
+    bannerEl.textContent = '';
+  }
+
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = '';
+  if(wrongLog.length === 0){
+    document.getElementById('noMistakes').style.display = 'block';
+  } else {
+    document.getElementById('noMistakes').style.display = 'none';
+    wrongLog.forEach(item=>{
+      const div = document.createElement('div');
+      div.className = 'review-item was-wrong';
+      div.innerHTML = `
+        <div class="q">${item.q}</div>
+        <div class="fix">Jawaban benar: <strong>${item.correctAnswer}</strong> — ${item.explain}</div>
+      `;
+      reviewList.appendChild(div);
+    });
+  }
+
+  const actions = document.getElementById('resultActions');
+  actions.innerHTML = '';
+  const backBtn = document.createElement('button');
+  backBtn.className = 'btn btn-outline';
+  backBtn.textContent = 'Kembali ke Level';
+  backBtn.onclick = ()=> showView('quiz-home');
+  actions.appendChild(backBtn);
+
+  const retryBtn = document.createElement('button');
+  retryBtn.className = 'btn btn-gold';
+  retryBtn.textContent = 'Coba Lagi';
+  retryBtn.onclick = retryLevel;
+  actions.appendChild(retryBtn);
+
+  if(pct >= 60 && isLastLevelOfBagian && hasNextBagian){
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn btn-primary';
+    nextBtn.textContent = `Lanjut ke ${bagianList[activeBagianIndex+1].title} →`;
+    nextBtn.onclick = ()=> openBagian(activeBagianIndex+1);
+    actions.appendChild(nextBtn);
+  }
+}
+
+/* refresh peta belajar tiap kali dibuka lewat nav */
+document.querySelector('nav.links button[data-view="bagian-list"]').addEventListener('click', renderBagianGrid);
+
+/* ================= INIT ================= */
+renderBagianGrid();
+if(isLoggedIn()){
+  applyLoggedInUI();
+  showView('home');
+} else {
+  showView('login');
+}
+</script>
+
+</body>
+</html>

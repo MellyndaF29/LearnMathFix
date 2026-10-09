@@ -1,0 +1,2912 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LearnMathFix — Belajar Matematika, Betulkan Tiap Langkah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#050d24;--navy:#0d1f4d;--navy-deep:#081436;--royal:#1f4fbf;--sky:#8fb4ff;
+    --bronze:#c9a45c;--bronze-deep:#9c7a35;--bronze-light:#ecd39a;
+    --parch:#f5f1e4;--parch-2:#ebe6d3;--line:#d9d0b4;
+    --ink:#14213f;--ink-soft:#4b5678;
+    --correct:#2f9461;--correct-bg:#e3f4ea;--wrong:#d0553a;--wrong-bg:#fbe6df;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;font-family:'Work Sans',sans-serif;color:var(--ink);min-height:100vh;
+    background:radial-gradient(ellipse at 15% 0%,rgba(31,79,191,.45),transparent 55%),
+      radial-gradient(ellipse at 90% 35%,rgba(56,104,220,.25),transparent 50%),
+      linear-gradient(#050d24,#0a1a44 60%,#050d24);
+    background-attachment:fixed;
+  }
+  body::before,body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-repeat:no-repeat;animation:twinkle 4.5s ease-in-out infinite alternate;
+  }
+  body::before{background-image:
+    radial-gradient(1.5px 1.5px at 8% 14%,#fff,transparent),radial-gradient(1px 1px at 22% 40%,#cfe0ff,transparent),
+    radial-gradient(2px 2px at 35% 8%,#fff,transparent),radial-gradient(1px 1px at 48% 62%,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 63% 22%,#ecd39a,transparent),radial-gradient(1px 1px at 78% 75%,#cfe0ff,transparent),
+    radial-gradient(2px 2px at 91% 12%,#fff,transparent),radial-gradient(1px 1px at 12% 84%,#fff,transparent);}
+  body::after{animation-delay:2s;background-image:
+    radial-gradient(1px 1px at 15% 30%,#fff,transparent),radial-gradient(2px 2px at 29% 70%,#ecd39a,transparent),
+    radial-gradient(1px 1px at 44% 28%,#cfe0ff,transparent),radial-gradient(1.5px 1.5px at 58% 90%,#fff,transparent),
+    radial-gradient(1px 1px at 70% 48%,#fff,transparent),radial-gradient(2px 2px at 84% 34%,#cfe0ff,transparent),
+    radial-gradient(1px 1px at 95% 86%,#fff,transparent),radial-gradient(1.5px 1.5px at 4% 56%,#ecd39a,transparent);}
+  @keyframes twinkle{from{opacity:.35}to{opacity:1}}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  h1,h2,h3,.brand{font-family:'Cinzel',serif;}
+  a{color:inherit;}
+
+  header{position:sticky;top:0;z-index:50;background:linear-gradient(#0b1b47,#081436);border-bottom:3px solid var(--bronze);box-shadow:0 6px 24px rgba(0,0,0,.45);}
+  .nav-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;}
+  .brand{color:var(--bronze-light);font-size:1.25rem;font-weight:700;letter-spacing:1px;display:flex;align-items:center;gap:10px;}
+  .brand-mark{
+    width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#f3dfaa,var(--bronze) 60%,var(--bronze-deep));
+    display:flex;align-items:center;justify-content:center;color:var(--navy-deep);font-weight:700;font-family:'Cinzel',serif;font-size:.95rem;
+    box-shadow:0 0 14px rgba(236,211,154,.55);
+  }
+  nav.links{display:flex;gap:6px;}
+  nav.links button{background:none;border:none;color:#b9c9f2;font-family:'Work Sans',sans-serif;font-size:.95rem;font-weight:600;padding:9px 14px;border-radius:8px;cursor:pointer;transition:all .15s;}
+  nav.links button:hover{background:rgba(143,180,255,.12);color:#fff;}
+  nav.links button.active{background:linear-gradient(var(--bronze-light),var(--bronze));color:var(--navy-deep);}
+
+  .user-box{display:flex;align-items:center;gap:12px;}
+  .user-chip{color:#e7ecfb;font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--bronze);color:var(--navy-deep);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:700;font-size:.85rem;}
+  .logout-btn{background:none;border:1px solid rgba(201,164,92,.5);color:var(--bronze-light);font-size:.85rem;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:'Work Sans',sans-serif;}
+  .logout-btn:hover{background:rgba(201,164,92,.15);}
+
+  main{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 24px 90px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .hero{padding:72px 0 48px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;}
+  .eyebrow-hero{color:var(--bronze-light);letter-spacing:3px;font-size:.78rem;font-weight:700;text-transform:uppercase;margin-bottom:14px;}
+  .hero h1{font-size:clamp(2rem,4.6vw,3.1rem);line-height:1.15;margin:0 0 18px;color:#f6efd8;font-weight:700;text-shadow:0 0 28px rgba(143,180,255,.35);}
+  .hero p{font-size:1.08rem;color:#b9c9f2;max-width:46ch;margin:0 0 28px;line-height:1.6;}
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn{display:inline-block;padding:13px 24px;border-radius:10px;font-weight:600;font-size:.98rem;text-decoration:none;border:2px solid transparent;cursor:pointer;font-family:'Work Sans',sans-serif;transition:transform .15s,box-shadow .15s,background .15s;}
+  .btn:hover:not(:disabled){transform:translateY(-2px);}
+  .btn-primary{background:linear-gradient(135deg,var(--royal),var(--navy));color:#fff;border-color:var(--bronze);}
+  .btn-primary:hover{box-shadow:0 0 18px rgba(80,130,255,.6);}
+  .btn-gold{background:linear-gradient(var(--bronze-light),var(--bronze));color:var(--navy-deep);}
+  .btn-gold:hover{box-shadow:0 0 18px rgba(236,211,154,.6);}
+  .btn-outline{background:transparent;border-color:var(--navy);color:var(--navy);}
+  .btn-outline:hover{background:var(--navy);color:var(--parch);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .hero-card{background:linear-gradient(150deg,#16348a,#0a1a44);border:1px solid var(--bronze);border-radius:20px;padding:30px;color:#f6efd8;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(60,110,240,.35);animation:floaty 6s ease-in-out infinite;}
+  .hero-card::after{content:"";position:absolute;right:-40px;bottom:-40px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(236,211,154,.35),transparent 70%);}
+  .hero-eq{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;margin:0 0 6px;}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px;}
+  .stat b{display:block;font-family:'Cinzel',serif;font-size:1.9rem;color:var(--bronze-light);}
+  .stat span{font-size:.85rem;color:#b9c9f2;}
+
+  section.block{padding:56px 0;border-top:1px solid rgba(201,164,92,.25);}
+  .block-head{margin-bottom:32px;}
+  .block-head h2{font-size:1.9rem;margin:0 0 8px;color:#f6efd8;}
+  .block-head p{color:#b9c9f2;margin:0;max-width:60ch;}
+  .breadcrumb{display:flex;align-items:center;gap:8px;color:#9fb6ec;font-size:.9rem;margin-bottom:18px;cursor:pointer;font-weight:600;}
+  .breadcrumb:hover{color:var(--bronze-light);}
+
+  .path{position:relative;display:flex;flex-direction:column;gap:0;}
+  .bagian-card{
+    display:grid;grid-template-columns:64px 1fr auto;gap:20px;align-items:center;
+    background:var(--parch);border:1px solid var(--bronze);border-radius:var(--radius);
+    padding:22px 24px;position:relative;margin-bottom:22px;box-shadow:0 10px 26px rgba(0,0,0,.35);
+    transition:transform .2s,box-shadow .2s;
+  }
+  .bagian-card:not(.locked):hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(60,110,240,.35);}
+  .bagian-card:not(:last-child)::after{content:"";position:absolute;left:32px;bottom:-22px;width:2px;height:22px;background:repeating-linear-gradient(var(--bronze) 0 4px,transparent 4px 8px);}
+  .bagian-num{
+    width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--royal),var(--navy));color:var(--bronze-light);
+    display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:700;font-size:1.4rem;border:2px solid var(--bronze);
+  }
+  .bagian-card.locked .bagian-num{background:#c9cfe0;color:#8892ab;border-color:#aab2c8;}
+  .bagian-info h3{margin:0 0 4px;font-size:1.15rem;color:var(--navy);}
+  .bagian-info p{margin:0 0 8px;color:var(--ink-soft);font-size:.92rem;}
+  .bagian-progress{display:flex;gap:6px;}
+  .prog-dot{width:10px;height:10px;border-radius:50%;background:var(--line);}
+  .prog-dot.done{background:linear-gradient(var(--sky),var(--royal));box-shadow:0 0 8px rgba(80,130,255,.7);}
+  .bagian-status{font-size:.78rem;font-weight:700;color:var(--bronze-deep);}
+  .bagian-card.locked .bagian-status{color:#8892ab;}
+  .bagian-card.locked{opacity:.75;}
+
+  .book{
+    background:var(--parch);border-radius:18px;border:1px solid var(--bronze);min-height:420px;display:flex;flex-direction:column;
+    box-shadow:inset 0 0 0 6px var(--parch),inset 0 0 0 7px var(--line),0 20px 50px rgba(0,0,0,.5);
+  }
+  .book-head{padding:30px 40px 0;}
+  .book-head .eyebrow-top{color:var(--bronze-deep);font-weight:700;font-size:.82rem;letter-spacing:1.5px;text-transform:uppercase;}
+  .book-head h2{margin:4px 0 0;color:var(--navy);font-size:1.5rem;}
+  .book-page{padding:20px 44px 34px;flex:1;}
+  .book-page .eyebrow{color:var(--royal);font-weight:700;font-size:.82rem;margin-bottom:6px;letter-spacing:1px;}
+  .book-page h3{margin:0 0 14px;font-size:1.35rem;color:var(--navy);}
+  .book-page p{color:var(--ink-soft);line-height:1.7;margin:0 0 14px;font-size:1.03rem;}
+  .book-page .example{background:rgba(31,79,191,.08);border-left:4px solid var(--royal);padding:14px 18px;border-radius:0 8px 8px 0;margin-top:16px;font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:1.3rem;color:var(--navy);}
+  .book-footer{display:flex;align-items:center;justify-content:space-between;padding:16px 30px 22px;border-top:1px solid var(--line);}
+  .page-dots{display:flex;gap:7px;}
+  .page-dots span{width:8px;height:8px;border-radius:50%;background:var(--line);}
+  .page-dots span.on{background:var(--royal);box-shadow:0 0 8px rgba(80,130,255,.8);}
+  .book-nav-btn{background:linear-gradient(135deg,var(--royal),var(--navy));color:#fff;border:1px solid var(--bronze);border-radius:8px;padding:9px 16px;cursor:pointer;font-weight:600;font-family:'Work Sans',sans-serif;}
+  .book-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+  .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .level-card{background:var(--parch);border:1px solid var(--bronze);border-radius:var(--radius);padding:24px;position:relative;box-shadow:0 10px 26px rgba(0,0,0,.35);}
+  .level-num{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--royal),var(--navy));color:var(--bronze-light);border:2px solid var(--bronze);display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-weight:700;margin-bottom:14px;}
+  .level-card h3{margin:0 0 6px;font-size:1.05rem;color:var(--navy);}
+  .level-card p{margin:0 0 16px;color:var(--ink-soft);font-size:.9rem;}
+  .level-best{font-size:.8rem;color:var(--correct);font-weight:600;margin-bottom:12px;min-height:16px;}
+  .level-locked{filter:grayscale(.5);opacity:.65;}
+  .lock-badge{position:absolute;top:20px;right:20px;font-size:.75rem;color:var(--ink-soft);background:var(--parch-2);padding:3px 9px;border-radius:20px;border:1px solid var(--line);}
+
+  .quiz-wrap{background:var(--parch);border:1px solid var(--bronze);border-radius:18px;padding:34px;box-shadow:inset 0 0 0 6px var(--parch),inset 0 0 0 7px var(--line),0 20px 50px rgba(0,0,0,.5);}
+  .quiz-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .quiz-progress{flex:1;height:9px;background:var(--parch-2);border-radius:8px;margin:0 18px;overflow:hidden;border:1px solid var(--line);}
+  .quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--royal),var(--sky));width:0%;transition:width .3s;}
+  .quiz-score{font-weight:700;color:var(--navy);font-family:'Cinzel',serif;}
+  .quiz-q{font-size:1.25rem;color:var(--navy);margin:0 0 22px;line-height:1.45;font-weight:600;}
+  .options{display:grid;gap:12px;}
+  .opt{text-align:left;padding:14px 18px;border:2px solid var(--line);border-radius:10px;background:#fbf8ee;cursor:pointer;font-family:'Work Sans',sans-serif;font-size:1rem;color:var(--ink);transition:all .15s;}
+  .opt:hover:not(:disabled){border-color:var(--royal);transform:translateX(4px);box-shadow:0 0 12px rgba(31,79,191,.25);}
+  .opt:disabled{cursor:default;}
+  .opt.correct-pick,.opt.reveal-correct{border-color:var(--correct);background:var(--correct-bg);}
+  .opt.wrong-pick{border-color:var(--wrong);background:var(--wrong-bg);}
+
+  .feedback{margin-top:20px;padding:16px 18px;border-radius:10px;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:var(--correct-bg);border:1px solid var(--correct);}
+  .feedback.no{background:var(--wrong-bg);border:1px solid var(--wrong);}
+  .feedback b{display:block;margin-bottom:4px;font-family:'Cinzel',serif;font-size:1rem;}
+  .feedback.ok b{color:var(--correct);}
+  .feedback.no b{color:var(--wrong);}
+  .feedback p{margin:0;color:var(--ink-soft);font-size:.92rem;line-height:1.5;}
+  .quiz-actions{display:flex;justify-content:flex-end;margin-top:22px;}
+
+  .result-score{text-align:center;padding:20px 0 10px;}
+  .result-score b{font-family:'Cinzel',serif;font-size:3.2rem;color:var(--navy);display:block;}
+  .result-score span{color:var(--ink-soft);}
+  .result-banner{text-align:center;background:var(--correct-bg);border:1px solid var(--correct);color:var(--correct);padding:12px 16px;border-radius:10px;margin:14px 0 0;font-weight:600;display:none;}
+  .result-banner.show{display:block;}
+  .review-item{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:12px;}
+  .review-item.was-wrong{border-color:var(--wrong);background:var(--wrong-bg);}
+  .review-item .q{font-weight:600;color:var(--navy);margin-bottom:6px;}
+  .review-item .fix{font-size:.9rem;color:var(--ink-soft);}
+  .result-actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;}
+
+  footer{position:relative;z-index:1;background:#040a1d;border-top:2px solid var(--bronze);color:#8fa3d6;text-align:center;padding:26px;font-size:.85rem;}
+
+  .login-wrap{min-height:calc(100vh - 90px);display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+  .login-grid{display:grid;grid-template-columns:1fr 1fr;max-width:920px;width:100%;background:var(--parch);border-radius:20px;overflow:hidden;border:1px solid var(--bronze);box-shadow:0 0 50px rgba(60,110,240,.35),0 20px 50px rgba(0,0,0,.5);}
+  .login-side{background:linear-gradient(160deg,#173a9a,#081436);color:#f6efd8;padding:44px 38px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
+  .login-side::after{content:"";position:absolute;left:-50px;top:-50px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(236,211,154,.35),transparent 70%);}
+  .login-side .brand-mark{margin-bottom:18px;}
+  .login-side h2{font-size:1.5rem;margin:0 0 12px;line-height:1.3;color:var(--bronze-light);}
+  .login-side p{color:#b9c9f2;font-size:.95rem;line-height:1.6;margin:0;}
+  .login-form-side{padding:44px 38px;}
+  .login-form-side h3{margin:0 0 6px;color:var(--navy);font-size:1.3rem;}
+  .login-form-side .sub{color:var(--ink-soft);font-size:.92rem;margin:0 0 26px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
+  .field input{width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid var(--line);font-family:'Work Sans',sans-serif;font-size:.95rem;background:#fbf8ee;color:var(--ink);}
+  .field input:focus{outline:none;border-color:var(--royal);box-shadow:0 0 0 3px rgba(31,79,191,.18);}
+  .login-error{display:none;background:var(--wrong-bg);border:1px solid var(--wrong);color:var(--wrong);padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:14px;}
+  .login-error.show{display:block;}
+  .login-submit{width:100%;margin-top:6px;}
+  .login-note{font-size:.8rem;color:var(--ink-soft);margin-top:16px;text-align:center;}
+
+
+  .ex-stage{position:relative;border-radius:14px;overflow:hidden;border:2px solid var(--bronze);background:#0a1a44;}
+  #exCanvas{display:block;width:100%;height:auto;}
+  .ex-modal{display:none;position:absolute;inset:0;background:rgba(5,13,36,.72);align-items:center;justify-content:center;padding:14px;}
+  .ex-modal.show{display:flex;}
+  .ex-panel{background:var(--parch);border:1px solid var(--bronze);border-radius:14px;padding:22px;max-width:540px;width:100%;max-height:100%;overflow:auto;box-shadow:0 0 30px rgba(60,110,240,.4);}
+  .ex-panel .quiz-q{font-size:1.1rem;}
+  .ex-hint{color:var(--ink-soft);font-size:.85rem;text-align:center;margin:12px 0 0;}
+  .dpad{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(2,52px);gap:6px;justify-content:center;margin-top:12px;}
+  .dp{background:linear-gradient(135deg,var(--royal),var(--navy));color:#fff;border:1px solid var(--bronze);border-radius:10px;font-size:1.1rem;cursor:pointer;touch-action:none;user-select:none;}
+  .dp:active{filter:brightness(1.3);}
+  .dp-act{background:linear-gradient(var(--bronze-light),var(--bronze));color:var(--navy-deep);font-weight:700;}
+
+
+  /* ===== versi lebih lembut & ramah anak ===== */
+  body,.btn,.opt,.field input,nav.links button,.book-nav-btn,.logout-btn{font-family:'Nunito',sans-serif;}
+  h1,h2,h3,.brand,.quiz-score,.stat b,.bagian-num,.level-num,.result-score b,.feedback b,.user-avatar,.brand-mark,.eyebrow-hero{font-family:'Fredoka',sans-serif;}
+  .btn,.book-nav-btn,.logout-btn,nav.links button{border-radius:999px;}
+  .bagian-card,.level-card,.quiz-wrap,.book,.login-grid,.hero-card{border-radius:26px;}
+  .opt{border-radius:16px;}
+  .opt:hover:not(:disabled){transform:translateX(4px) rotate(-.4deg);}
+  .btn:hover:not(:disabled){transform:translateY(-3px) scale(1.03);}
+  .bagian-num,.level-num{animation:bob 3s ease-in-out infinite;}
+  .brand-mark:hover{animation:wiggle .6s ease;}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+  .ex-stage{border-radius:26px;border-width:3px;box-shadow:0 0 30px rgba(80,130,255,.35);}
+  .ex-panel{border-radius:22px;animation:pop .25s ease;}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .dp{border-radius:50%;}
+  @media (prefers-reduced-motion:reduce){.bagian-num,.level-num{animation:none;}}
+
+  @media (max-width:820px){
+    .hero{grid-template-columns:1fr;}
+    .level-grid{grid-template-columns:1fr;}
+    .bagian-card{grid-template-columns:44px 1fr;}
+    .bagian-card > .btn{grid-column:1 / -1;}
+    nav.links{display:none;}
+  }
+  @media (max-width:720px){
+    .login-grid{grid-template-columns:1fr;}
+    .login-side{display:none;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    body::before,body::after,.hero-card{animation:none;}
+  }
+
+/* =========================================================
+   LEARNMATHFIX — MAGICAL MATH ADVENTURE UI
+   VISUAL REDESIGN ONLY
+   Fitur, data, soal, progress, game, dan navigasi tetap.
+   ========================================================= */
+
+:root{
+  --magic-blue:#092a61;
+  --magic-blue-2:#0d4388;
+  --magic-blue-3:#1768bd;
+  --magic-sky:#7fc7ff;
+  --magic-gold:#ffc83d;
+  --magic-gold-2:#f4a928;
+  --magic-cream:#fff8e8;
+  --magic-paper:#fffdf7;
+  --magic-green:#55c78b;
+  --magic-purple:#8b68d9;
+  --magic-text:#18345c;
+  --magic-muted:#61728c;
+  --magic-shadow:0 16px 40px rgba(7,39,88,.18);
+}
+
+/* ---------- GLOBAL ---------- */
+body{
+  font-family:'Nunito',sans-serif;
+  color:var(--magic-text);
+  background:
+    radial-gradient(circle at 15% 8%,rgba(127,199,255,.24),transparent 25%),
+    radial-gradient(circle at 90% 20%,rgba(255,200,61,.13),transparent 25%),
+    linear-gradient(135deg,#eaf5ff 0%,#f7fbff 48%,#fff8e9 100%);
+  background-attachment:fixed;
+}
+body::before{
+  opacity:.22;
+  background-image:
+    radial-gradient(3px 3px at 10% 18%,#fff,transparent),
+    radial-gradient(2px 2px at 24% 72%,#ffc83d,transparent),
+    radial-gradient(3px 3px at 42% 28%,#fff,transparent),
+    radial-gradient(2px 2px at 67% 12%,#7fc7ff,transparent),
+    radial-gradient(3px 3px at 82% 64%,#fff,transparent),
+    radial-gradient(2px 2px at 93% 30%,#ffc83d,transparent);
+}
+body::after{
+  opacity:.12;
+  background-image:
+    radial-gradient(2px 2px at 17% 48%,#fff,transparent),
+    radial-gradient(3px 3px at 52% 78%,#7fc7ff,transparent),
+    radial-gradient(2px 2px at 77% 35%,#ffc83d,transparent);
+}
+h1,h2,h3,.brand,.quiz-score,.stat b,.bagian-num,.level-num,
+.result-score b,.feedback b,.user-avatar,.brand-mark{
+  font-family:'Fredoka',sans-serif;
+}
+main{
+  max-width:none;
+  margin:0;
+  padding:0 34px 80px 270px;
+}
+a{color:inherit}
+
+/* ---------- SIDEBAR / HEADER ---------- */
+header{
+  position:fixed;
+  z-index:100;
+  inset:0 auto 0 0;
+  width:228px;
+  height:100vh;
+  border:0;
+  border-right:1px solid rgba(255,255,255,.12);
+  border-radius:0 28px 28px 0;
+  background:
+    radial-gradient(circle at 70% 5%,rgba(72,155,255,.25),transparent 30%),
+    linear-gradient(180deg,#082b61 0%,#062352 52%,#061b40 100%);
+  box-shadow:10px 0 30px rgba(6,34,74,.18);
+}
+.nav-inner{
+  width:100%;
+  height:100%;
+  max-width:none;
+  margin:0;
+  padding:22px 15px 18px;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:flex-start;
+}
+.brand{
+  color:#fff;
+  font-size:1.08rem;
+  letter-spacing:.2px;
+  justify-content:center;
+  gap:8px;
+  padding:4px 4px 28px;
+}
+.brand::after{
+  content:"Learn · Practice · Grow";
+  position:absolute;
+  top:59px;
+  left:0;
+  width:100%;
+  text-align:center;
+  color:#c9def8;
+  font-family:'Nunito',sans-serif;
+  font-size:.53rem;
+  font-weight:700;
+  letter-spacing:.3px;
+}
+.brand-mark{
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:linear-gradient(145deg,#fff6c9,#ffc83d 62%,#e99b19);
+  color:#092a61;
+  border:2px solid rgba(255,255,255,.7);
+  box-shadow:0 6px 16px rgba(255,200,61,.24);
+}
+nav.links{
+  display:flex !important;
+  flex-direction:column;
+  gap:7px;
+  margin-top:18px;
+}
+nav.links button{
+  width:100%;
+  border:0;
+  padding:12px 15px;
+  border-radius:13px;
+  text-align:left;
+  color:#e7f2ff;
+  background:transparent;
+  font-size:.86rem;
+  font-weight:800;
+  transition:.2s ease;
+}
+nav.links button::first-letter{font-size:1rem}
+nav.links button:hover{
+  color:#fff;
+  background:rgba(255,255,255,.09);
+  transform:translateX(3px);
+}
+nav.links button.active{
+  color:#18345c;
+  background:linear-gradient(135deg,#ffd95b,#ffc33b);
+  box-shadow:0 8px 20px rgba(255,193,50,.2);
+}
+.user-box{
+  margin-top:auto;
+  padding:12px 8px 2px;
+  display:flex !important;
+  flex-direction:column;
+  align-items:stretch;
+  gap:9px;
+  border-top:1px solid rgba(255,255,255,.12);
+}
+.user-chip{
+  color:#fff;
+  font-size:.82rem;
+  padding:5px 7px;
+  justify-content:center;
+}
+.user-avatar{
+  width:34px;
+  height:34px;
+  background:linear-gradient(145deg,#fff1bd,#ffc83d);
+  color:#18345c;
+}
+.logout-btn{
+  width:100%;
+  border:1px solid rgba(255,255,255,.2);
+  background:rgba(255,255,255,.07);
+  color:#fff;
+  padding:9px 12px;
+}
+.logout-btn:hover{
+  background:rgba(255,255,255,.14);
+}
+
+/* ---------- LOGIN ---------- */
+body.login-screen header{display:none}
+body.login-screen main{
+  padding:0;
+  min-height:100vh;
+}
+body.login-screen footer{display:none}
+.login-wrap{
+  min-height:100vh;
+  padding:28px;
+  background:
+    radial-gradient(circle at 20% 15%,rgba(103,180,255,.4),transparent 28%),
+    radial-gradient(circle at 82% 22%,rgba(255,205,73,.2),transparent 24%),
+    linear-gradient(145deg,#06245a,#0d4f99 52%,#0a2c66);
+  position:relative;
+  overflow:hidden;
+}
+.login-wrap::before{
+  content:"✦  ✧  ✦     ✧     ✦  ✧     ✦";
+  position:absolute;
+  inset:55px 0 auto;
+  text-align:center;
+  color:rgba(255,255,255,.6);
+  font-size:1.1rem;
+  letter-spacing:30px;
+  animation:magicStars 5s ease-in-out infinite;
+}
+.login-wrap::after{
+  content:"";
+  position:absolute;
+  width:500px;
+  height:500px;
+  right:-180px;
+  bottom:-220px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,208,79,.28),transparent 68%);
+}
+.login-grid{
+  position:relative;
+  z-index:2;
+  max-width:1050px;
+  min-height:610px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1.18fr .82fr;
+  background:transparent;
+  border:0;
+  border-radius:30px;
+  overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,20,55,.35);
+}
+.login-side{
+  padding:48px 46px;
+  min-height:610px;
+  justify-content:flex-end;
+  background:
+    linear-gradient(180deg,rgba(4,31,77,.12),rgba(3,21,54,.5)),
+    radial-gradient(circle at 50% 15%,rgba(111,190,255,.28),transparent 28%);
+  position:relative;
+}
+.login-side::before{
+  content:"✦";
+  position:absolute;
+  top:48px;
+  right:55px;
+  color:#ffd45a;
+  font-size:2rem;
+  animation:floaty 3s ease-in-out infinite;
+}
+.login-side .brand-mark{
+  width:64px;
+  height:64px;
+  border-radius:20px;
+  font-size:1.15rem;
+  margin-bottom:auto;
+}
+.login-side h2{
+  max-width:430px;
+  color:#fff7dc;
+  font-size:2.1rem;
+  line-height:1.15;
+  margin:0 0 14px;
+}
+.login-side p{
+  max-width:470px;
+  color:#d6e8ff;
+}
+.login-form-side{
+  padding:52px 42px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(255,213,87,.14),transparent 30%),
+    var(--magic-cream);
+}
+.login-form-side h3{
+  color:#092a61;
+  font-size:1.65rem;
+  margin-bottom:7px;
+}
+.login-form-side .sub{color:#61728c}
+.field label{font-weight:800;color:#18345c}
+.field input{
+  border:2px solid #d9e2ef;
+  border-radius:13px;
+  padding:13px 15px;
+  background:#fff;
+}
+.field input:focus{
+  border-color:#4c9ee8;
+  box-shadow:0 0 0 4px rgba(76,158,232,.12);
+}
+.login-submit{
+  border:0;
+  background:linear-gradient(135deg,#ffd75b,#ffb92f);
+  color:#18345c;
+  box-shadow:0 9px 20px rgba(245,174,42,.25);
+}
+.login-submit:hover{box-shadow:0 13px 26px rgba(245,174,42,.34)}
+.login-note{color:#77869b}
+
+/* ---------- HOME ---------- */
+.hero{
+  min-height:430px;
+  padding:40px 0 25px;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:24px;
+  align-items:stretch;
+}
+.hero>div:first-child{
+  position:relative;
+  overflow:hidden;
+  border-radius:28px;
+  padding:42px 42px;
+  background:
+    radial-gradient(circle at 80% 20%,rgba(117,202,255,.42),transparent 28%),
+    linear-gradient(135deg,#0a3979,#0c5da6 60%,#174f90);
+  box-shadow:var(--magic-shadow);
+  border:1px solid rgba(255,255,255,.2);
+}
+.hero>div:first-child::before{
+  content:"✦   ✧        ✦";
+  position:absolute;
+  top:24px;
+  right:28px;
+  color:#ffe17a;
+  letter-spacing:12px;
+  opacity:.85;
+}
+.hero>div:first-child::after{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  right:-90px;
+  bottom:-110px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,214,90,.25),transparent 68%);
+}
+.eyebrow-hero{
+  color:#ffe07a;
+  font-size:.78rem;
+  letter-spacing:1.2px;
+}
+.hero h1{
+  max-width:650px;
+  margin:12px 0 16px;
+  color:#fff;
+  font-size:clamp(2.1rem,4vw,3.35rem);
+  line-height:1.08;
+}
+.hero p{
+  max-width:610px;
+  color:#d8ebff;
+  font-size:1rem;
+}
+.hero-actions{position:relative;z-index:2}
+.hero-card{
+  min-height:100%;
+  padding:30px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 25% 20%,rgba(255,215,93,.18),transparent 30%),
+    linear-gradient(145deg,#fffdf6,#fff3cf);
+  border:2px solid #f0c75b;
+  box-shadow:var(--magic-shadow);
+  color:#18345c;
+  animation:floaty 5s ease-in-out infinite;
+}
+.hero-card::before{
+  content:"🪄";
+  position:absolute;
+  right:28px;
+  top:24px;
+  font-size:2.3rem;
+}
+.hero-eq{
+  color:#18345c;
+  font-family:'Fredoka',sans-serif;
+}
+.hero-stats{
+  gap:12px;
+  margin-top:25px;
+}
+.stat{
+  padding:15px;
+  border-radius:18px;
+  background:rgba(255,255,255,.72);
+  border:1px solid #f0d78d;
+}
+.stat b{color:#1768bd}
+.stat span{color:#61728c}
+
+/* ---------- SECTIONS ---------- */
+section.block{
+  padding:30px 0 40px;
+  border:0;
+}
+.block-head{margin-bottom:20px}
+.block-head h2{
+  color:#092a61;
+  font-size:1.9rem;
+  margin-bottom:4px;
+}
+.block-head p{color:#61728c}
+.breadcrumb{
+  color:#1768bd;
+  margin-bottom:16px;
+  width:max-content;
+  padding:7px 12px;
+  border-radius:999px;
+  background:#e8f4ff;
+}
+.breadcrumb:hover{
+  color:#092a61;
+  background:#d9edff;
+}
+
+/* ---------- LEARNING MAP ---------- */
+.path{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+.bagian-card{
+  min-height:185px;
+  display:grid;
+  grid-template-columns:64px 1fr auto;
+  gap:17px;
+  align-items:center;
+  margin:0;
+  padding:22px;
+  border:1px solid #d9e6f2;
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 95% 0%,rgba(255,207,76,.14),transparent 25%),
+    #fff;
+  box-shadow:0 9px 25px rgba(20,70,120,.1);
+}
+.bagian-card:nth-child(2){background:linear-gradient(145deg,#fff,#f1fff7)}
+.bagian-card:nth-child(3){background:linear-gradient(145deg,#fff,#f5f0ff)}
+.bagian-card:nth-child(4){background:linear-gradient(145deg,#fff,#fff7e8)}
+.bagian-card:not(:last-child)::after{display:none}
+.bagian-card:not(.locked):hover{
+  transform:translateY(-5px);
+  box-shadow:0 17px 32px rgba(20,70,120,.16);
+}
+.bagian-num{
+  width:56px;
+  height:56px;
+  border:0;
+  color:#fff;
+  background:linear-gradient(145deg,#3d9ce7,#1459b0);
+  box-shadow:0 7px 14px rgba(22,94,177,.2);
+}
+.bagian-info h3{color:#18345c}
+.bagian-info p{color:#687a91}
+.prog-dot{
+  width:11px;height:11px;
+  background:#dbe5ef;
+}
+.prog-dot.done{
+  background:#ffc83d;
+  box-shadow:0 0 8px rgba(255,200,61,.4);
+}
+.bagian-status{color:#1768bd}
+.bagian-card.locked{
+  opacity:.7;
+  background:#f2f5f8;
+}
+
+/* ---------- BUTTONS ---------- */
+.btn{
+  border:0;
+  border-radius:999px;
+  padding:11px 20px;
+  font-weight:800;
+  box-shadow:none;
+}
+.btn-primary{
+  color:#fff;
+  background:linear-gradient(135deg,#1768bd,#0b438d);
+  box-shadow:0 7px 15px rgba(23,104,189,.2);
+}
+.btn-gold{
+  color:#18345c;
+  background:linear-gradient(135deg,#ffd85b,#ffb52e);
+}
+.btn-outline{
+  color:#1768bd;
+  border:2px solid #a9cde9;
+  background:#fff;
+}
+.btn:hover:not(:disabled){
+  transform:translateY(-3px) scale(1.02);
+}
+
+/* ---------- BOOK ---------- */
+.book{
+  min-height:470px;
+  border:2px solid #ebc85d;
+  border-radius:25px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(255,207,81,.2),transparent 22%),
+    #fffdf6;
+  box-shadow:var(--magic-shadow);
+  overflow:hidden;
+}
+.book-head{
+  padding:25px 34px 14px;
+  background:linear-gradient(135deg,#fff5ce,#fffdf6);
+  border-bottom:1px solid #f1dfad;
+}
+.book-head .eyebrow-top{color:#d18b16}
+.book-head h2{color:#092a61}
+.book-page{padding:26px 40px 35px}
+.book-page .eyebrow{color:#1768bd}
+.book-page h3{color:#18345c}
+.book-page p{color:#5f7189}
+.book-page .example{
+  border-left:0;
+  border-radius:17px;
+  background:#eaf6ff;
+  color:#14549c;
+  padding:16px 19px;
+  font-family:'Nunito',sans-serif;
+  font-style:normal;
+}
+.book-footer{
+  background:#fffaf0;
+  border-top:1px solid #eadfbf;
+}
+.book-nav-btn{
+  border:0;
+  background:linear-gradient(135deg,#1768bd,#0b438d);
+  color:#fff;
+}
+
+/* ---------- QUIZ LEVELS ---------- */
+.level-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:18px;
+}
+.level-card{
+  padding:23px;
+  border:1px solid #dbe5ee;
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 9px 25px rgba(20,70,120,.09);
+}
+.level-card:nth-child(1){background:linear-gradient(145deg,#fff,#eef8ff)}
+.level-card:nth-child(2){background:linear-gradient(145deg,#fff,#effcf5)}
+.level-card:nth-child(3){background:linear-gradient(145deg,#fff,#f6f0ff)}
+.level-num{
+  border:0;
+  background:linear-gradient(145deg,#1768bd,#55aee9);
+  color:#fff;
+}
+.level-best{color:#3a9d72}
+.lock-badge{
+  background:#f3f6f9;
+  border:1px solid #dce5ed;
+}
+
+/* ---------- QUIZ PLAY / RESULT ---------- */
+.quiz-wrap{
+  border:2px solid #e4d18c;
+  border-radius:25px;
+  background:#fffdf7;
+  box-shadow:var(--magic-shadow);
+  padding:32px;
+}
+.quiz-progress{
+  height:11px;
+  background:#e8eef5;
+  border:0;
+}
+.quiz-progress-fill{
+  background:linear-gradient(90deg,#4ca7e8,#1768bd);
+}
+.quiz-score{color:#1768bd}
+.quiz-q{color:#18345c}
+.options{gap:10px}
+.opt{
+  border:2px solid #dce6ef;
+  background:#fff;
+  color:#18345c;
+}
+.opt:hover:not(:disabled){
+  border-color:#66afe5;
+  background:#f4fbff;
+  box-shadow:0 7px 16px rgba(35,113,174,.1);
+}
+.feedback{
+  border-radius:17px;
+}
+.result-score b{color:#1768bd}
+.result-banner{border-radius:16px}
+
+/* ---------- EXPLORE LIST ---------- */
+#view-explore-list .block-head{
+  padding:25px 30px;
+  border-radius:25px;
+  color:#fff;
+  background:
+    radial-gradient(circle at 80% 10%,rgba(110,195,255,.3),transparent 28%),
+    linear-gradient(135deg,#0b3e7e,#1768bd);
+  box-shadow:var(--magic-shadow);
+}
+#view-explore-list .block-head h2{color:#fff}
+#view-explore-list .block-head p{color:#dceeff}
+#view-explore-list .path{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+/* ---------- EXPLORE GAME ---------- */
+.ex-stage{
+  border:3px solid #e9c85a;
+  border-radius:25px;
+  background:#0b3975;
+  box-shadow:0 20px 45px rgba(9,48,94,.18);
+}
+.ex-panel{
+  background:#fffdf7;
+  border:2px solid #e8c65c;
+  border-radius:22px;
+}
+.ex-hint{color:#687a91}
+.dp{
+  border:0;
+  background:linear-gradient(145deg,#1768bd,#0b438d);
+  box-shadow:0 5px 10px rgba(13,66,133,.2);
+}
+
+/* ---------- FOOTER ---------- */
+footer{
+  margin-left:228px;
+  background:#06224d;
+  border:0;
+  color:#bdd7f2;
+  padding:20px;
+}
+
+/* ---------- MAGIC DECORATIONS ---------- */
+@keyframes magicStars{
+  0%,100%{transform:translateY(0);opacity:.45}
+  50%{transform:translateY(-8px);opacity:1}
+}
+@keyframes softGlow{
+  0%,100%{box-shadow:0 8px 22px rgba(23,104,189,.08)}
+  50%{box-shadow:0 12px 30px rgba(23,104,189,.17)}
+}
+.hero-card,.bagian-card,.level-card{animation:softGlow 4.5s ease-in-out infinite}
+.bagian-card:nth-child(2),.level-card:nth-child(2){animation-delay:.6s}
+.bagian-card:nth-child(3),.level-card:nth-child(3){animation-delay:1.2s}
+.bagian-card:nth-child(4){animation-delay:1.8s}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:1050px){
+  main{padding-left:250px;padding-right:22px}
+  .path{grid-template-columns:1fr}
+  #view-explore-list .path{grid-template-columns:1fr 1fr}
+  .hero{grid-template-columns:1fr}
+  .hero-card{min-height:260px}
+}
+@media (max-width:820px){
+  header{
+    position:sticky;
+    inset:auto;
+    width:100%;
+    height:auto;
+    border-radius:0;
+  }
+  .nav-inner{
+    height:auto;
+    min-height:70px;
+    padding:10px 14px;
+    flex-direction:row;
+    align-items:center;
+  }
+  .brand{padding:0;justify-content:flex-start}
+  .brand::after{display:none}
+  nav.links{
+    flex-direction:row;
+    margin:0;
+    overflow:auto;
+    scrollbar-width:none;
+  }
+  nav.links button{
+    width:auto;
+    white-space:nowrap;
+    padding:9px 11px;
+  }
+  .user-box{
+    margin:0;
+    padding:0;
+    border:0;
+    flex-direction:row;
+    align-items:center;
+  }
+  .logout-btn{width:auto}
+  main{padding:0 18px 70px}
+  footer{margin-left:0}
+  .hero{padding-top:20px}
+  .level-grid{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  .login-wrap{padding:14px}
+  .login-grid{grid-template-columns:1fr;min-height:auto}
+  .login-side{display:none}
+  .login-form-side{padding:35px 24px}
+  #view-explore-list .path{grid-template-columns:1fr}
+  .bagian-card{
+    grid-template-columns:50px 1fr;
+  }
+  .bagian-card>.btn{
+    grid-column:1/-1;
+  }
+  .quiz-wrap{padding:20px}
+  .book-page{padding:22px}
+  .hero>div:first-child{padding:30px 25px}
+}
+@media (prefers-reduced-motion:reduce){
+  .hero-card,.bagian-card,.level-card{animation:none}
+  .login-wrap::before{animation:none}
+}
+
+
+/* =========================================================
+   V2 — LOGO ASLI + KONTRAS TEKS
+   ========================================================= */
+.lmf-logo{
+  display:block;
+  width:174px;
+  height:auto;
+  object-fit:contain;
+  object-position:center;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.18));
+}
+.login-logo{
+  display:block;
+  width:245px;
+  max-width:78%;
+  height:auto;
+  object-fit:contain;
+  margin:0 auto 24px;
+  filter:drop-shadow(0 5px 10px rgba(0,0,0,.18));
+}
+.brand{
+  min-height:54px;
+}
+.brand::after{display:none !important}
+
+/* Pastikan semua teks utama pada halaman terang punya kontras tinggi */
+.block-head h2,
+.book-head h2,
+.book-page h3,
+.level-card h3,
+.quiz-q,
+.result-score b,
+.bagian-info h3{
+  color:#12345f !important;
+}
+.block-head p,
+.book-page p,
+.level-card p,
+.bagian-info p,
+.login-form-side .sub,
+.login-note{
+  color:#52677f !important;
+}
+.book-page .example{
+  color:#124d8e !important;
+  background:#e8f5ff !important;
+}
+.opt{
+  color:#17395f !important;
+  background:#ffffff !important;
+  border-color:#c9d9e8 !important;
+}
+.opt:hover:not(:disabled){
+  color:#0c4f94 !important;
+  background:#eef8ff !important;
+}
+.bagian-status{color:#1263ae !important}
+.level-best{color:#27865f !important}
+
+/* Teks pada sidebar */
+nav.links button{color:#f5f9ff !important}
+nav.links button.active{color:#17395f !important}
+.user-chip{color:#fff !important}
+.logout-btn{color:#fff !important}
+
+/* Teks hero */
+.hero h1{color:#fff !important}
+.hero p{color:#e5f2ff !important}
+.hero-card{color:#17395f !important}
+.hero-card .hero-eq{color:#17395f !important}
+.hero-card .stat span{color:#52677f !important}
+.hero-card .stat b{color:#1263ae !important}
+
+/* Login */
+.login-side h2{color:#fff8dd !important}
+.login-side p{color:#e1efff !important}
+.login-form-side h3{color:#12345f !important}
+.field label{color:#17395f !important}
+.field input{color:#17395f !important}
+.login-note{color:#52677f !important}
+
+/* Judul game/explore dan teks modal */
+.ex-panel .quiz-q,
+.ex-panel p,
+.ex-hint{
+  color:#17395f !important;
+}
+
+/* Logo sidebar tidak dipaksa menjadi kecil oleh aturan lama */
+@media (max-width:820px){
+  .lmf-logo{width:145px}
+}
+/* ===== ILUSTRASI PECAHAN PIZZA ===== */
+
+.fraction-illustration {
+  margin: 25px auto;
+  padding: 25px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #fff8df, #eef8ff);
+  border: 2px solid #ffd45c;
+  text-align: center;
+  max-width: 700px;
+}
+
+.fraction-illustration h3 {
+  margin-top: 0;
+  color: #174a8b;
+  font-size: 22px;
+}
+
+.pizza-area {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.pizza {
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  position: relative;
+  background:
+    conic-gradient(
+      #ffd85a 0deg 90deg,
+      #ffb84d 90deg 180deg,
+      #ffd85a 180deg 270deg,
+      #ffb84d 270deg 360deg
+    );
+  border: 8px solid #d98935;
+  box-shadow: 0 8px 18px rgba(0,0,0,.15);
+  overflow: hidden;
+}
+
+/* garis pembagi pizza */
+.pizza::before,
+.pizza::after {
+  content: "";
+  position: absolute;
+  background: #fff4cf;
+  z-index: 3;
+}
+
+/* garis vertikal */
+.pizza::before {
+  width: 5px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+/* garis horizontal */
+.pizza::after {
+  width: 100%;
+  height: 5px;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* bagian pizza yang bisa diklik */
+.pizza-piece {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  z-index: 5;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.pizza-piece:hover {
+  filter: brightness(1.12);
+  transform: scale(1.04);
+}
+
+.pizza-piece.selected {
+  background: rgba(80, 190, 255, .45);
+  box-shadow: inset 0 0 0 5px #168bd4;
+}
+
+/* posisi 4 bagian */
+.piece-1 {
+  left: 0;
+  top: 0;
+}
+
+.piece-2 {
+  right: 0;
+  top: 0;
+}
+
+.piece-3 {
+  left: 0;
+  bottom: 0;
+}
+
+.piece-4 {
+  right: 0;
+  bottom: 0;
+}
+
+.fraction-result {
+  margin-top: 18px;
+  padding: 15px;
+  border-radius: 15px;
+  background: white;
+  font-size: 20px;
+  font-weight: bold;
+  color: #174a8b;
+}
+
+.fraction-number {
+  font-size: 32px;
+  color: #f39a1e;
+}
+
+.fraction-question {
+  font-size: 17px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.fraction-hint {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #666;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <div class="brand"><img class="lmf-logo" src="data:image/png;base64,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" alt="LearnMathFix"></div>
+    <nav class="links" id="mainNav" style="display:none;">
+      <button data-view="home" class="active">Beranda</button>
+      <button data-view="bagian-list">Peta Belajar</button>
+      <button data-view="explore-list">Jelajah</button>
+    </nav>
+    <div class="user-box" id="userBox" style="display:none;">
+      <span class="user-chip"><span class="user-avatar" id="userAvatar">?</span><span id="userName"></span></span>
+      <button class="logout-btn" onclick="logout()">Keluar</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ LOGIN ============ -->
+  <section id="view-login" class="view active">
+    <div class="login-wrap">
+      <div class="login-grid">
+        <div class="login-side">
+          <span class="brand-mark">√x</span>
+          <h2>Masuk dulu, baru mulai merapal angka.</h2>
+          <p>Login membantu LearnMathFix menyimpan progres tiap bagian dan level kuis di perangkat ini, jadi kamu bisa lanjut kapan saja tanpa mengulang dari awal.</p>
+        </div>
+        <div class="login-form-side">
+          <h3>Masuk ke LearnMathFix</h3>
+          <p class="sub">Isi namamu dan email untuk mulai belajar.</p>
+          <div class="login-error" id="loginError">Nama dan email wajib diisi ya.</div>
+          <form id="loginForm" novalidate onsubmit="return handleLogin(event)">
+            <div class="field">
+              <label for="loginName">Nama</label>
+              <input type="text" id="loginName" placeholder="Nama kamu" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" placeholder="nama@email.com" autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="loginPassword">Kata sandi</label>
+              <input type="password" id="loginPassword" placeholder="Minimal 4 karakter" autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-gold login-submit">Masuk & Mulai Belajar</button>
+          </form>
+          <p class="login-note">Demo lokal: data disimpan di peramban ini saja, belum terhubung ke server sungguhan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOME ============ -->
+  <section id="view-home" class="view">
+    <div class="hero">
+      <div>
+        <div class="eyebrow-hero">✦ Asrama Biru · Sekolah Sihir Angka</div>
+        <h1>Setiap kesalahan itu langkah, bukan akhir.</h1>
+        <p>LearnMathFix mengajakmu belajar satu bagian penuh dulu lewat buku interaktif, baru lanjut mengerjakan kuis berlevel dari bagian itu. Kalau jawabanmu keliru, langsung ada pembenarannya sebelum lanjut ke bagian berikutnya.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="showView('bagian-list')">Lihat Peta Belajar</button>
+        </div>
+      </div>
+      <div class="hero-card">
+        <p class="hero-eq">🪄 Bagian 1 → Kuis Bagian 1</p>
+        <p class="hero-eq" style="opacity:.6;font-size:1.1rem;">Bagian 2 → Kuis Bagian 2 → ...</p>
+        <div class="hero-stats">
+          <div class="stat"><b>4</b><span>bagian belajar</span></div>
+          <div class="stat"><b>3</b><span>level kuis per bagian</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PETA BELAJAR (daftar bagian) ============ -->
+  <section id="view-bagian-list" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="block-head">
+        <h2>Peta Belajar</h2>
+        <p>Selesaikan buku dan kuis Bagian 1 dulu sampai lulus, baru Bagian 2 terbuka. Begitu seterusnya.</p>
+      </div>
+      <div class="path" id="bagianGrid"></div>
+    </section>
+  </section>
+
+  <!-- ============ BUKU (per bagian) ============ -->
+  <section id="view-book" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="breadcrumb" onclick="showView('bagian-list')">← Kembali ke Peta Belajar</div>
+      <div class="book">
+        <div class="book-head">
+          <div class="eyebrow-top" id="bookEyebrow"></div>
+          <h2 id="bookTitle"></h2>
+        </div>
+        <div class="book-page" id="bookPage"></div>
+        <div class="book-footer">
+          <button class="book-nav-btn" id="prevPageBtn" onclick="turnPage(-1)">← Sebelumnya</button>
+          <div class="page-dots" id="pageDots"></div>
+          <button class="book-nav-btn" id="nextPageBtn" onclick="turnPage(1)">Berikutnya →</button>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ KUIS: PILIH LEVEL (per bagian) ============ -->
+  <section id="view-quiz-home" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="breadcrumb" onclick="showView('book')">← Kembali ke Buku Bagian Ini</div>
+      <div class="block-head">
+        <h2 id="quizHomeTitle">Kuis Bagian</h2>
+        <p>Selesaikan level 1 dulu untuk membuka level berikutnya. Nilai minimal 60% untuk lulus tiap level.</p>
+      </div>
+      <div class="level-grid" id="levelGrid"></div>
+    </section>
+  </section>
+
+  <!-- ============ KUIS: SEDANG BERMAIN ============ -->
+  <section id="view-quiz-play" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="quiz-wrap">
+        <div class="quiz-top">
+          <span id="quizLevelLabel" style="font-weight:600;color:var(--ink-soft);"></span>
+          <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+          <span class="quiz-score" id="quizScoreLabel">Skor: 0</span>
+        </div>
+        <p class="quiz-q" id="quizQuestion"></p>
+        <div class="options" id="quizOptions"></div>
+        <div class="feedback" id="quizFeedback">
+          <b id="feedbackTitle"></b>
+          <p id="feedbackText"></p>
+        </div>
+        <div class="quiz-actions">
+          <button class="btn btn-primary" id="quizNextBtn" style="display:none;" onclick="nextQuestion()">Lanjut →</button>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ KUIS: HASIL ============ -->
+  <section id="view-quiz-result" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="quiz-wrap">
+        <div class="result-score">
+          <b id="resultScore">0/0</b>
+          <span id="resultMsg">jawaban benar</span>
+        </div>
+        <div class="result-banner" id="resultBanner"></div>
+        <h3 style="color:var(--navy);margin:26px 0 14px;">Pembenaran soal yang keliru</h3>
+        <div id="reviewList"></div>
+        <div id="noMistakes" style="display:none;color:var(--ink-soft);">Mantap, tidak ada yang perlu dibenarkan di level ini!</div>
+        <div class="result-actions" id="resultActions"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============ JELAJAH: DAFTAR ============ -->
+  <section id="view-explore-list" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="block-head">
+        <h2>Jelajah Dunia Angka</h2>
+        <p>Jalan-jalan di peta, temukan kristal, dan jawab soal di tiap kristal. Tiap dunia terbuka setelah kamu menyelesaikan buku bagiannya (dan bagian sebelumnya sudah lulus di Peta Belajar).</p>
+      </div>
+      <div class="path" id="exploreGrid"></div>
+    </section>
+  </section>
+
+  <!-- ============ JELAJAH: MAIN ============ -->
+  <section id="view-explore-play" class="view">
+    <section class="block" style="border-top:none;padding-top:44px;">
+      <div class="breadcrumb" onclick="leaveExplore()">← Kembali ke Daftar Jelajah</div>
+      <div class="quiz-wrap">
+        <div class="quiz-top">
+          <span id="exTitle" style="font-weight:600;color:var(--ink-soft);"></span>
+          <div class="quiz-progress"><div class="quiz-progress-fill" id="exFill"></div></div>
+          <span class="quiz-score" id="exScore">💎 0/0</span>
+        </div>
+        <div class="ex-stage">
+          <canvas id="exCanvas" width="720" height="440"></canvas>
+          <div class="ex-modal" id="exModal">
+            <div class="ex-panel">
+              <p class="quiz-q" id="exQ"></p>
+              <div class="options" id="exOpts"></div>
+              <div class="feedback" id="exFb"><b id="exFbTitle"></b><p id="exFbText"></p></div>
+              <div class="quiz-actions"><button class="btn btn-primary" id="exNextBtn" style="display:none;" onclick="closeStation()">Lanjut menjelajah →</button></div>
+            </div>
+          </div>
+        </div>
+        <p class="ex-hint" id="exHint">Gerak: tombol panah atau WASD. Dekati kristal lalu tekan E atau Spasi (di HP, pakai tombol di bawah).</p>
+        <div class="dpad">
+          <button class="dp" data-dir="up" style="grid-area:1/2">▲</button>
+          <button class="dp" data-dir="left" style="grid-area:2/1">◀</button>
+          <button class="dp" data-dir="down" style="grid-area:2/2">▼</button>
+          <button class="dp" data-dir="right" style="grid-area:2/3">▶</button>
+          <button class="dp dp-act" data-act="1" style="grid-area:1/3">E</button>
+        </div>
+      </div>
+    </section>
+  </section>
+
+</main>
+
+<footer>LearnMathFix — belajar matematika, betulkan tiap langkah keliru. ✦ Bertema dunia sihir, bukan produk resmi.</footer>
+
+<script>
+/* ================= PENYIMPANAN AMAN (fallback jika localStorage diblokir) ================= */
+/* ================= PENYIMPANAN PER AKUN ================= */
+/*
+  Progress setiap akun disimpan berdasarkan email.
+  Jadi akun yang berbeda tidak akan menggunakan progress yang sama.
+*/
+
+const memoryStore = {};
+
+/* Data yang berlaku secara global, bukan milik akun tertentu */
+const GLOBAL_KEYS = [
+  'lmf_logged_in',
+  'lmf_active_user'
+];
+
+
+/* ================= STORAGE GLOBAL ================= */
+
+function safeGetGlobal(key){
+  try {
+    return localStorage.getItem(key);
+  } catch(e) {
+    return Object.prototype.hasOwnProperty.call(memoryStore, key)
+      ? memoryStore[key]
+      : null;
+  }
+}
+
+function safeSetGlobal(key, value){
+  try {
+    localStorage.setItem(key, value);
+  } catch(e) {
+    memoryStore[key] = value;
+  }
+}
+
+function safeRemoveGlobal(key){
+  try {
+    localStorage.removeItem(key);
+  } catch(e) {
+    delete memoryStore[key];
+  }
+}
+
+
+/* ================= IDENTITAS AKUN AKTIF ================= */
+
+function getUserKey(){
+  const email = safeGetGlobal('lmf_active_user');
+
+  if(!email){
+    return 'guest';
+  }
+
+  return encodeURIComponent(
+    email.toLowerCase().trim()
+  );
+}
+
+
+/* ================= MEMBUAT KEY PER AKUN ================= */
+
+function accountKey(key){
+
+  /* Key global tidak diberi nama akun */
+  if(GLOBAL_KEYS.includes(key)){
+    return key;
+  }
+
+  const user = getUserKey();
+
+  return `lmf_user_${user}_${key}`;
+}
+
+
+/* ================= STORAGE PER AKUN ================= */
+
+function safeGet(key){
+
+  /* Kalau key global */
+  if(GLOBAL_KEYS.includes(key)){
+    return safeGetGlobal(key);
+  }
+
+  const finalKey = accountKey(key);
+
+  try {
+    return localStorage.getItem(finalKey);
+  } catch(e) {
+    return Object.prototype.hasOwnProperty.call(
+      memoryStore,
+      finalKey
+    )
+      ? memoryStore[finalKey]
+      : null;
+  }
+}
+
+
+function safeSet(key, value){
+
+  /* Kalau key global */
+  if(GLOBAL_KEYS.includes(key)){
+    safeSetGlobal(key, value);
+    return;
+  }
+
+  const finalKey = accountKey(key);
+
+  try {
+    localStorage.setItem(finalKey, value);
+  } catch(e) {
+    memoryStore[finalKey] = value;
+  }
+}
+
+
+function safeRemove(key){
+
+  /* Kalau key global */
+  if(GLOBAL_KEYS.includes(key)){
+    safeRemoveGlobal(key);
+    return;
+  }
+
+  const finalKey = accountKey(key);
+
+  try {
+    localStorage.removeItem(finalKey);
+  } catch(e) {
+    delete memoryStore[finalKey];
+  }
+}
+
+/* ================= NAVIGASI ANTAR VIEW ================= */
+function showView(name){
+  if(name !== 'login' && !isLoggedIn()){
+    name = 'login';
+  }
+  document.body.classList.toggle('login-screen', name === 'login');
+  if(name!=='explore-play') stopExplore();
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('nav.links button').forEach(b=>b.classList.remove('active'));
+  const navMap = {home:'home', 'bagian-list':'bagian-list', book:'bagian-list', 'quiz-home':'bagian-list', 'quiz-play':'bagian-list', 'quiz-result':'bagian-list', 'explore-list':'explore-list', 'explore-play':'explore-list'};
+  if(navMap[name]){
+    const target = document.querySelector(`nav.links button[data-view="${navMap[name]}"]`);
+    if(target) target.classList.add('active');
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('nav.links button').forEach(btn=>{
+  btn.addEventListener('click', ()=>showView(btn.dataset.view));
+});
+
+/* ================= LOGIN GATE ================= */
+function isLoggedIn(){
+  return safeGet('lmf_logged_in') === '1';
+}
+function handleLogin(e){
+  e.preventDefault();
+  const name = document.getElementById('loginName').value.trim();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const err = document.getElementById('loginError');
+  if(!name || !email || password.length < 4){
+    err.textContent = !name || !email ? 'Nama dan email wajib diisi ya.' : 'Kata sandi minimal 4 karakter.';
+    err.classList.add('show');
+    return false;
+  }
+  err.classList.remove('show');
+  safeSet('lmf_logged_in', '1');
+  safeSet('lmf_user_name', name);
+  applyLoggedInUI();
+  showView('home');
+  return false;
+}
+function logout(){
+  safeRemove('lmf_logged_in');
+  document.getElementById('mainNav').style.display = 'none';
+  document.getElementById('userBox').style.display = 'none';
+  document.getElementById('loginForm').reset();
+  showView('login');
+}
+function applyLoggedInUI(){
+  const name = safeGet('lmf_user_name') || 'Pelajar';
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userAvatar').textContent = name.trim().charAt(0).toUpperCase() || '?';
+  document.getElementById('mainNav').style.display = 'flex';
+  document.getElementById('userBox').style.display = 'flex';
+}
+
+/* ================= DATA: BAGIAN (buku + kuis berlevel per bagian) ================= */
+const bagianList = [
+  {
+    id:1,
+    title:'Bagian 1: Mengenal Bilangan Rasional',
+    desc:'Memahami pengertian, bentuk, dan cara mengenali bilangan rasional.',
+    pages:[
+      {eyebrow:'Materi 1', title:'Apa Itu Bilangan Rasional?', body:'Bilangan rasional adalah bilangan yang dapat ditulis dalam bentuk a/b, dengan a dan b bilangan bulat dan b tidak sama dengan 0.', example:'Contoh: 1/2, -3/4, 5, dan 0,25 merupakan bilangan rasional karena dapat ditulis sebagai pecahan.'},
+      {eyebrow:'Materi 2', title:'Bentuk Bilangan Rasional', body:'Bilangan rasional dapat berbentuk pecahan biasa, pecahan campuran, bilangan bulat, desimal berhingga, atau desimal berulang.', example:'2 = 2/1, 0,5 = 1/2, dan 0,333... = 1/3.'},
+      {eyebrow:'Materi 3', title:'Mengenali Bilangan Rasional', body:'Untuk menentukan apakah suatu bilangan rasional, periksa apakah bilangan tersebut dapat dinyatakan sebagai perbandingan dua bilangan bulat dengan penyebut bukan nol.', example:'√4 = 2 adalah rasional, sedangkan √2 tidak dapat dinyatakan sebagai a/b dengan a dan b bulat.'}
+    ],
+    levels:[
+      {id:1,name:'Kuis 1 — Pengertian',questions:[
+        {q:'Bilangan rasional adalah bilangan yang dapat ditulis dalam bentuk ...',options:['a/b dengan a,b bilangan bulat dan b ≠ 0','a/b dengan b = 0','a+b dengan a,b sembarang','a²'],correct:0,explain:'Bilangan rasional dapat ditulis sebagai a/b dengan a dan b bilangan bulat serta b tidak boleh 0.'},
+        {q:'Manakah yang merupakan bilangan rasional?',options:['√2','π','3/5','√3'],correct:2,explain:'3/5 sudah berbentuk perbandingan dua bilangan bulat dengan penyebut bukan nol.'},
+        {q:'Bilangan 7 dapat ditulis sebagai ...',options:['7/0','0/7','7/1','1/7'],correct:2,explain:'Setiap bilangan bulat dapat ditulis sebagai bilangan tersebut dibagi 1, jadi 7 = 7/1.'}
+      ]},
+      {id:2,name:'Kuis 2 — Bentuk Bilangan',questions:[
+        {q:'Bentuk pecahan dari 0,5 adalah ...',options:['1/5','1/2','5/2','2/5'],correct:1,explain:'0,5 = 5/10 = 1/2 setelah disederhanakan.'},
+        {q:'Bentuk pecahan dari 2 adalah ...',options:['2/0','2/1','1/2','0/2'],correct:1,explain:'Bilangan bulat 2 dapat ditulis sebagai 2/1.'},
+        {q:'Bilangan 0,75 setara dengan ...',options:['1/4','2/3','3/4','4/5'],correct:2,explain:'0,75 = 75/100 = 3/4 setelah disederhanakan.'}
+      ]},
+      {id:3,name:'Kuis 3 — Mengenali',questions:[
+        {q:'Manakah yang bukan bilangan rasional?',options:['4','-2/3','√2','0,25'],correct:2,explain:'√2 adalah bilangan irasional karena tidak dapat dinyatakan sebagai a/b dengan a dan b bilangan bulat.'},
+        {q:'Apakah √9 merupakan bilangan rasional?',options:['Ya, karena √9 = 3','Tidak, karena semua akar irasional','Tidak, karena 9 bukan pecahan','Ya, karena √9 = 9/0'],correct:0,explain:'√9 = 3 dan 3 = 3/1, sehingga √9 merupakan bilangan rasional.'},
+        {q:'Manakah pasangan yang keduanya rasional?',options:['√2 dan π','1/3 dan 0,2','√5 dan √7','π dan √3'],correct:1,explain:'1/3 dan 0,2 keduanya dapat ditulis sebagai perbandingan bilangan bulat.'}
+      ]}
+    ]
+  },
+  {
+    id:2,
+    title:'Bagian 2: Penjumlahan & Pengurangan',
+    desc:'Memahami cara menjumlahkan dan mengurangkan bilangan rasional.',
+    pages:[
+      {eyebrow:'Materi 1', title:'Penjumlahan Bilangan Rasional', body:'Jika penyebut sama, jumlahkan pembilangnya. Jika penyebut berbeda, samakan penyebut terlebih dahulu.', example:'1/4 + 2/4 = 3/4. Untuk 1/2 + 1/3, samakan penyebut menjadi 6: 3/6 + 2/6 = 5/6.'},
+      {eyebrow:'Materi 2', title:'Pengurangan Bilangan Rasional', body:'Pengurangan dilakukan dengan prinsip yang sama: penyebut harus sama sebelum pembilang dikurangkan.', example:'3/4 - 1/4 = 2/4 = 1/2.'},
+      {eyebrow:'Materi 3', title:'Menyederhanakan Hasil', body:'Setelah menjumlahkan atau mengurangkan, sederhanakan pecahan dengan membagi pembilang dan penyebut menggunakan FPB.', example:'6/8 = 3/4 karena 6 dan 8 sama-sama dibagi 2.'}
+    ],
+    levels:[
+      {id:1,name:'Kuis 1 — Penjumlahan',questions:[
+        {q:'1/4 + 2/4 = ...',options:['2/4','3/4','3/8','1/2'],correct:1,explain:'Penyebut sama, jadi pembilang dijumlahkan: 1 + 2 = 3, sehingga hasilnya 3/4.'},
+        {q:'1/2 + 1/2 = ...',options:['1/2','1','2','1/4'],correct:1,explain:'1/2 + 1/2 = 2/2 = 1.'},
+        {q:'1/3 + 1/6 = ...',options:['2/9','1/2','2/6','1/3'],correct:1,explain:'Samakan penyebut menjadi 6: 1/3 = 2/6, lalu 2/6 + 1/6 = 3/6 = 1/2.'}
+      ]},
+      {id:2,name:'Kuis 2 — Pengurangan',questions:[
+        {q:'3/5 - 1/5 = ...',options:['2/5','2/10','1/5','4/5'],correct:0,explain:'Penyebut sama, jadi 3 - 1 = 2. Hasilnya 2/5.'},
+        {q:'3/4 - 1/2 = ...',options:['1/4','2/4','1/2','3/2'],correct:0,explain:'1/2 = 2/4, sehingga 3/4 - 2/4 = 1/4.'},
+        {q:'5/6 - 1/3 = ...',options:['4/3','1/2','2/6','1/6'],correct:1,explain:'1/3 = 2/6, sehingga 5/6 - 2/6 = 3/6 = 1/2.'}
+      ]},
+      {id:3,name:'Kuis 3 — Penyederhanaan',questions:[
+        {q:'4/8 jika disederhanakan menjadi ...',options:['1/2','2/3','4/4','1/4'],correct:0,explain:'4 dan 8 dibagi FPB 4, sehingga 4/8 = 1/2.'},
+        {q:'2/3 + 1/6 = ...',options:['3/9','5/6','2/6','1'],correct:1,explain:'2/3 = 4/6, sehingga 4/6 + 1/6 = 5/6.'},
+        {q:'7/8 - 1/4 = ...',options:['6/8','5/8','3/4','1/2'],correct:1,explain:'1/4 = 2/8, sehingga 7/8 - 2/8 = 5/8.'}
+      ]}
+    ]
+  },
+  {
+    id:3,
+    title:'Bagian 3: Perkalian & Pembagian',
+    desc:'Memahami aturan perkalian, pembagian, dan penyederhanaan bilangan rasional.',
+    pages:[
+      {eyebrow:'Materi 1', title:'Perkalian Bilangan Rasional', body:'Kalikan pembilang dengan pembilang dan penyebut dengan penyebut. Hasilnya kemudian dapat disederhanakan.', example:'2/3 × 3/5 = 6/15 = 2/5.'},
+      {eyebrow:'Materi 2', title:'Pembagian Bilangan Rasional', body:'Untuk membagi pecahan, ubah menjadi perkalian dengan membalik pecahan kedua.', example:'3/4 ÷ 2/5 = 3/4 × 5/2 = 15/8.'},
+      {eyebrow:'Materi 3', title:'Menyederhanakan Hasil Perkalian & Pembagian', body:'Sebelum atau sesudah menghitung, faktor yang sama dapat disederhanakan agar perhitungan lebih mudah.', example:'2/3 × 9/4 = 18/12 = 3/2.'}
+    ],
+    levels:[
+      {id:1,name:'Kuis 1 — Perkalian',questions:[
+        {q:'2/3 × 3/5 = ...',options:['2/5','6/15','3/8','5/2'],correct:0,explain:'2×3/(3×5) = 6/15 = 2/5.'},
+        {q:'1/2 × 4 = ...',options:['1','2','4','8'],correct:1,explain:'1/2 × 4 = 4/2 = 2.'},
+        {q:'3/4 × 2/3 = ...',options:['1/2','6/7','2/3','3/2'],correct:0,explain:'3×2/(4×3) = 6/12 = 1/2.'}
+      ]},
+      {id:2,name:'Kuis 2 — Pembagian',questions:[
+        {q:'4/5 ÷ 2/5 = ...',options:['2','2/5','8/25','1/2'],correct:0,explain:'4/5 × 5/2 = 20/10 = 2.'},
+        {q:'1/2 ÷ 1/4 = ...',options:['1/8','2','1/2','4'],correct:1,explain:'1/2 × 4/1 = 4/2 = 2.'},
+        {q:'3/4 ÷ 1/2 = ...',options:['3/8','3/2','1/2','2/3'],correct:1,explain:'3/4 × 2/1 = 6/4 = 3/2.'}
+      ]},
+      {id:3,name:'Kuis 3 — Sederhanakan',questions:[
+        {q:'2/3 × 9/4 = ...',options:['3/2','18/7','2/3','6/4'],correct:0,explain:'18/12 disederhanakan menjadi 3/2.'},
+        {q:'5/6 ÷ 5/12 = ...',options:['1/2','2','5/2','10'],correct:1,explain:'5/6 × 12/5 = 12/6 = 2.'},
+        {q:'3/5 × 10/9 = ...',options:['2/3','30/45','3/2','5/6'],correct:0,explain:'30/45 disederhanakan dengan 15 menjadi 2/3.'}
+      ]}
+    ]
+  },
+  {
+    id:4,
+    title:'Bagian 4: Operasi Campuran',
+    desc:'Menyelesaikan operasi campuran bilangan rasional dengan urutan operasi yang tepat.',
+    pages:[
+      {eyebrow:'Materi 1', title:'Memahami Operasi Campuran', body:'Dalam operasi campuran, kerjakan perkalian dan pembagian terlebih dahulu, kemudian penjumlahan dan pengurangan.', example:'1 + 1/2 × 2/3 = 1 + 1/3 = 4/3.'},
+      {eyebrow:'Materi 2', title:'Operasi dengan Tanda Kurung', body:'Tanda kurung dikerjakan terlebih dahulu. Setelah itu ikuti urutan operasi seperti biasa.', example:'(1/2 + 1/4) × 2 = 3/4 × 2 = 3/2.'},
+      {eyebrow:'Materi 3', title:'Menyelesaikan Operasi Campuran', body:'Tuliskan setiap langkah secara berurutan agar tidak tertukar antara operasi yang harus dikerjakan lebih dahulu.', example:'1 - 1/2 × 2/3 = 1 - 1/3 = 2/3.'}
+    ],
+    levels:[
+      {id:1,name:'Kuis 1 — Urutan Operasi',questions:[
+        {q:'1 + 1/2 × 2/3 = ...',options:['2/3','1','4/3','5/3'],correct:2,explain:'Kerjakan perkalian dulu: 1/2 × 2/3 = 1/3. Lalu 1 + 1/3 = 4/3.'},
+        {q:'2 - 1/2 × 2 = ...',options:['1','0','2','3'],correct:0,explain:'Perkalian dulu: 1/2 × 2 = 1. Kemudian 2 - 1 = 1.'},
+        {q:'1/2 + 1/3 × 3 = ...',options:['5/6','3/2','1/2','3/2?'],correct:1,explain:'Perkalian dulu: 1/3 × 3 = 1. Kemudian 1/2 + 1 = 3/2.'}
+      ]},
+      {id:2,name:'Kuis 2 — Tanda Kurung',questions:[
+        {q:'(1/2 + 1/4) × 2 = ...',options:['3/4','1','3/2','2'],correct:2,explain:'Kerjakan kurung: 1/2 + 1/4 = 3/4. Lalu 3/4 × 2 = 3/2.'},
+        {q:'(3/4 - 1/4) ÷ 2/3 = ...',options:['1/3','3/4','2/3','1/2'],correct:1,explain:'Kurung: 3/4 - 1/4 = 1/2. Lalu 1/2 ÷ 2/3 = 1/2 × 3/2 = 3/4.'},
+        {q:'(2/3 + 1/3) - 1/2 = ...',options:['1/2','2/3','1','3/2'],correct:0,explain:'Kurung menghasilkan 1, lalu 1 - 1/2 = 1/2.'}
+      ]},
+      {id:3,name:'Kuis 3 — Operasi Campuran',questions:[
+        {q:'1 - 1/2 × 2/3 = ...',options:['2/3','1/3','1/2','1/6'],correct:0,explain:'Perkalian dulu: 1/2 × 2/3 = 1/3. Kemudian 1 - 1/3 = 2/3.'},
+        {q:'2/3 + 1/2 × 4/3 = ...',options:['1','4/3','5/3','2'],correct:2,explain:'Perkalian: 1/2 × 4/3 = 2/3. Kemudian 2/3 + 2/3 = 4/3.'},
+        {q:'(1 - 1/3) ÷ 2/3 = ...',options:['1/3','1','2/3','3/2'],correct:1,explain:'Kurung: 1 - 1/3 = 2/3. Lalu 2/3 ÷ 2/3 = 1.'}
+      ]}
+    ]
+  }
+];
+
+let activeBagianIndex = 0;
+let currentPage = 0;
+let activeLevelIndex = 0;
+let qIndex = 0;
+let score = 0;
+let answered = false;
+let wrongLog = [];
+
+/* ================= PROGRES: wajib 100% ================= */
+function levelBest(bagianId, levelId){
+  return Number(safeGet(`lmf_best_${bagianId}_${levelId}`) || 0);
+}
+function setLevelBest(bagianId, levelId, pct){
+  const cur = levelBest(bagianId, levelId);
+  if(pct > cur) safeSet(`lmf_best_${bagianId}_${levelId}`, pct);
+}
+function isBagianComplete(bagianIndex){
+  const b = bagianList[bagianIndex];
+  return b.levels.every(lv => levelBest(b.id, lv.id) >= 100);
+}
+function isBagianUnlocked(bagianIndex){
+  if(bagianIndex === 0) return true;
+  return isBagianComplete(bagianIndex - 1);
+}
+function isLevelUnlocked(bagianIndex, levelIndex){
+  if(levelIndex === 0) return true;
+  const b = bagianList[bagianIndex];
+  return levelBest(b.id, b.levels[levelIndex-1].id) >= 100;
+}
+function bagianDoneCount(bagianIndex){
+  const b = bagianList[bagianIndex];
+  return b.levels.filter(lv => levelBest(b.id, lv.id) >= 100).length;
+}
+
+/* ================= STATUS BUKU & JELAJAH ================= */
+function isBookDone(bagianId){
+  return safeGet('lmf_book_' + bagianId) === '1';
+}
+function markBookDone(bagianId){
+  safeSet('lmf_book_' + bagianId, '1');
+}
+function isExploreUnlocked(bagianIndex){
+  // Jelajah untuk suatu bagian baru terbuka setelah BAGIAN tersebut selesai 100%.
+  // Jadi: Bagian 1 selesai -> Jelajah Bagian 1 terbuka + Bagian 2 terbuka.
+  // Bagian 2 selesai -> Jelajah Bagian 2 terbuka + Bagian 3 terbuka, dst.
+  return isBagianComplete(bagianIndex);
+}
+
+/* ================= PETA BELAJAR ================= */
+function renderBagianGrid(){
+  const grid = document.getElementById('bagianGrid');
+  grid.innerHTML = '';
+  bagianList.forEach((b, i)=>{
+    const unlocked = isBagianUnlocked(i);
+    const done = bagianDoneCount(i);
+    const complete = isBagianComplete(i);
+    const card = document.createElement('div');
+    card.className = 'bagian-card' + (unlocked ? '' : ' locked');
+    card.innerHTML = `
+      <div class="bagian-num">${b.id}</div>
+      <div class="bagian-info">
+        <h3>${b.title}</h3>
+        <p>${b.desc}</p>
+        <div class="bagian-progress">
+          ${b.levels.map((_,li)=> `<span class="prog-dot ${li < done ? 'done' : ''}"></span>`).join('')}
+        </div>
+        <div class="bagian-status" style="margin-top:8px;">
+          ${!unlocked ? '🔒 Terkunci — selesaikan bagian sebelumnya' : complete ? '✅ Selesai' : done > 0 ? `${done}/${b.levels.length} kuis lulus` : 'Belum dimulai'}
+        </div>
+      </div>
+      <button class="btn ${unlocked ? 'btn-primary' : 'btn-outline'}" ${unlocked ? '' : 'disabled'}>${unlocked ? 'Buka Bagian' : 'Terkunci'}</button>
+    `;
+    if(unlocked) card.querySelector('button').onclick = ()=> openBagian(i);
+    grid.appendChild(card);
+  });
+}
+
+function openBagian(bagianIndex){
+  if(!isBagianUnlocked(bagianIndex)) return;
+  activeBagianIndex = bagianIndex;
+  currentPage = 0;
+  showView('book');
+  renderBookPage();
+}
+
+/* ================= BUKU ================= */
+function renderBookPage(){
+  const bagian = bagianList[activeBagianIndex];
+  const page = bagian.pages[currentPage];
+  const isLastPage = currentPage === bagian.pages.length - 1;
+  document.getElementById('bookEyebrow').textContent = bagian.title;
+  document.getElementById('bookTitle').textContent = `Halaman ${currentPage+1} dari ${bagian.pages.length}`;
+  document.getElementById('bookPage').innerHTML = `
+    <div class="eyebrow">${page.eyebrow}</div>
+    <h3>${page.title}</h3>
+    <p>${page.body}</p>
+    <div class="example">${page.example}</div>
+  `;
+  document.getElementById('prevPageBtn').disabled = currentPage === 0;
+  const nextBtn = document.getElementById('nextPageBtn');
+  if(isLastPage){
+    markBookDone(bagian.id);
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Lanjut ke Pilihan Kuis →';
+    nextBtn.onclick = ()=> openQuizHome(activeBagianIndex);
+  } else {
+    nextBtn.disabled = false;
+    nextBtn.textContent = 'Berikutnya →';
+    nextBtn.onclick = ()=> turnPage(1);
+  }
+  const dots = document.getElementById('pageDots');
+  dots.innerHTML = '';
+  bagian.pages.forEach((_, i)=>{
+    const d = document.createElement('span');
+    if(i===currentPage) d.className = 'on';
+    dots.appendChild(d);
+  });
+}
+function turnPage(dir){
+  const bagian = bagianList[activeBagianIndex];
+  const next = currentPage + dir;
+  if(next < 0 || next >= bagian.pages.length) return;
+  currentPage = next;
+  renderBookPage();
+}
+
+/* ================= MENU PILIHAN KUIS ================= */
+function openQuizHome(bagianIndex){
+  if(!isBagianUnlocked(bagianIndex)) return;
+  activeBagianIndex = bagianIndex;
+  showView('quiz-home');
+  renderLevelGrid();
+}
+function renderLevelGrid(){
+  const bagian = bagianList[activeBagianIndex];
+  document.getElementById('quizHomeTitle').textContent = `Kuis ${bagian.title}`;
+  const grid = document.getElementById('levelGrid');
+  grid.innerHTML = '';
+  bagian.levels.forEach((lvl, i)=>{
+    const unlocked = isLevelUnlocked(activeBagianIndex, i);
+    const best = levelBest(bagian.id, lvl.id);
+    const card = document.createElement('div');
+    card.className = 'level-card' + (unlocked ? '' : ' level-locked');
+    card.innerHTML = `
+      ${unlocked ? '' : '<span class="lock-badge">🔒 Terkunci</span>'}
+      <div class="level-num">${lvl.id}</div>
+      <h3>${lvl.name}</h3>
+      <p>${lvl.questions.length} soal</p>
+      <div class="level-best">${best ? 'Skor terbaik: ' + best + '%' : 'Belum dikerjakan'}</div>
+      <button class="btn ${unlocked ? 'btn-primary' : 'btn-outline'}" style="width:100%;" ${unlocked ? '' : 'disabled'}>
+        ${unlocked ? (best === 100 ? 'Kerjakan Lagi' : 'Mulai Kuis') : 'Selesaikan kuis sebelumnya'}
+      </button>
+    `;
+    if(unlocked) card.querySelector('button').onclick = ()=> startLevel(i);
+    grid.appendChild(card);
+  });
+}
+
+/* ================= KUIS: bermain ================= */
+function startLevel(levelIndex){
+    if(!isLevelUnlocked(activeBagianIndex, levelIndex)) return;
+
+    activeLevelIndex = levelIndex;
+
+    // Reset kuis
+    qIndex = 0;
+    score = 0;
+    wrongLog = [];
+    answered = false;
+
+    showView('quiz-play');
+    renderQuestion();
+}
+/* ================= KUIS: BERMAIN ================= */
+
+function renderQuestion(){
+  const bagian = bagianList[activeBagianIndex];
+  const level = bagian.levels[activeLevelIndex];
+  const q = level.questions[qIndex];
+
+  answered = false;
+
+  document.getElementById('quizQuestion').textContent = q.q;
+
+  const optionsBox = document.getElementById('quizOptions');
+  optionsBox.innerHTML = '';
+
+  q.options.forEach((option, index) => {
+    const button = document.createElement('button');
+
+    button.className = 'opt';
+    button.textContent = option;
+
+    button.onclick = () => answerQuestion(index);
+
+    optionsBox.appendChild(button);
+  });
+
+  const nextBtn = document.getElementById('quizNextBtn');
+  if(nextBtn){
+    nextBtn.style.display = 'none';
+  }
+
+  const feedback = document.getElementById('quizFeedback');
+  if(feedback){
+    feedback.className = 'feedback';
+  }
+}
+
+
+function renderQuestion(){
+  const bagian = bagianList[activeBagianIndex];
+  const level = bagian.levels[activeLevelIndex];
+  const q = level.questions[qIndex];
+
+  answered = false;
+
+  // Judul level
+  const levelLabel = document.getElementById('quizLevelLabel');
+  if(levelLabel){
+    levelLabel.textContent = `${level.name} · Soal ${qIndex + 1} dari ${level.questions.length}`;
+  }
+
+  // Tampilkan soal
+  document.getElementById('quizQuestion').textContent = q.q;
+
+  // Tampilkan pilihan jawaban
+  const optionsBox = document.getElementById('quizOptions');
+  optionsBox.innerHTML = '';
+
+  q.options.forEach((option, index) => {
+    const button = document.createElement('button');
+
+    button.className = 'opt';
+    button.textContent = option;
+
+    button.onclick = () => answerQuestion(index);
+
+    optionsBox.appendChild(button);
+  });
+
+  // Reset feedback
+  const feedback = document.getElementById('quizFeedback');
+  if(feedback){
+    feedback.className = 'feedback';
+  }
+
+  const feedbackTitle = document.getElementById('feedbackTitle');
+  const feedbackText = document.getElementById('feedbackText');
+
+  if(feedbackTitle) feedbackTitle.textContent = '';
+  if(feedbackText) feedbackText.textContent = '';
+
+  // Tombol berikutnya disembunyikan dulu
+  const nextBtn = document.getElementById('quizNextBtn');
+
+  if(nextBtn){
+    nextBtn.style.display = 'none';
+    nextBtn.textContent = 'Soal Berikutnya →';
+  }
+
+  // =========================
+  // UPDATE SKOR
+  // =========================
+  const scoreLabel = document.getElementById('quizScoreLabel');
+
+  if(scoreLabel){
+    scoreLabel.textContent = `Skor: ${score}/${level.questions.length}`;
+  }
+
+  // =========================
+  // UPDATE PROGRESS
+  // =========================
+  const progressFill = document.getElementById('quizProgressFill');
+
+  if(progressFill){
+    const progress = ((qIndex) / level.questions.length) * 100;
+    progressFill.style.width = `${progress}%`;
+  }
+}
+
+
+function answerQuestion(selectedIndex){
+
+  // Jangan bisa menjawab dua kali
+  if(answered) return;
+
+  answered = true;
+
+  const bagian = bagianList[activeBagianIndex];
+  const level = bagian.levels[activeLevelIndex];
+  const q = level.questions[qIndex];
+
+  const buttons = document.querySelectorAll('#quizOptions .opt');
+
+  // Semua pilihan dinonaktifkan
+  buttons.forEach(button => {
+    button.disabled = true;
+  });
+
+  const feedback = document.getElementById('quizFeedback');
+  const feedbackTitle = document.getElementById('feedbackTitle');
+  const feedbackText = document.getElementById('feedbackText');
+
+  // =========================
+  // JAWABAN BENAR
+  // =========================
+  if(selectedIndex === q.correct){
+
+    score++;
+
+    buttons[selectedIndex].classList.add('correct-pick');
+
+    if(feedback){
+      feedback.className = 'feedback show ok';
+    }
+
+    if(feedbackTitle){
+      feedbackTitle.textContent = 'Benar! 🎉';
+    }
+
+    if(feedbackText){
+      feedbackText.textContent = q.explain;
+    }
+
+  }
+
+  // =========================
+  // JAWABAN SALAH
+  // =========================
+  else{
+
+    buttons[selectedIndex].classList.add('wrong-pick');
+
+    buttons[q.correct].classList.add('reveal-correct');
+
+    if(feedback){
+      feedback.className = 'feedback show no';
+    }
+
+    if(feedbackTitle){
+      feedbackTitle.textContent = 'Jawaban kurang tepat 😅';
+    }
+
+    if(feedbackText){
+      feedbackText.textContent =
+        `Jawaban yang benar adalah "${q.options[q.correct]}". ${q.explain}`;
+    }
+
+    wrongLog.push({
+      q: q.q,
+      correctAnswer: q.options[q.correct],
+      explain: q.explain
+    });
+  }
+
+  // =========================
+  // UPDATE SKOR SETELAH MENJAWAB
+  // =========================
+  const scoreLabel = document.getElementById('quizScoreLabel');
+
+  if(scoreLabel){
+    scoreLabel.textContent =
+      `Skor: ${score}/${level.questions.length}`;
+  }
+
+  // =========================
+  // UPDATE PROGRESS
+  // =========================
+  const progressFill = document.getElementById('quizProgressFill');
+
+  if(progressFill){
+    const progress =
+      ((qIndex + 1) / level.questions.length) * 100;
+
+    progressFill.style.width = `${progress}%`;
+  }
+
+  // =========================
+  // TOMBOL BERIKUTNYA
+  // =========================
+  const nextBtn = document.getElementById('quizNextBtn');
+
+  if(nextBtn){
+
+    nextBtn.style.display = 'inline-block';
+
+    if(qIndex === level.questions.length - 1){
+      nextBtn.textContent = 'Lihat Hasil →';
+    }else{
+      nextBtn.textContent = 'Soal Berikutnya →';
+    }
+  }
+}
+
+
+function nextQuestion(){
+
+  const bagian = bagianList[activeBagianIndex];
+  const level = bagian.levels[activeLevelIndex];
+
+  // Kalau masih ada soal berikutnya
+  if(qIndex < level.questions.length - 1){
+
+    qIndex++;
+
+    renderQuestion();
+
+  }
+
+  // Kalau sudah soal terakhir
+  else{
+
+    finishLevel();
+
+  }
+}
+
+  function startLevel(levelIndex){
+  if(!isLevelUnlocked(activeBagianIndex, levelIndex)) return;
+
+  activeLevelIndex = levelIndex;
+
+  qIndex = 0;
+  score = 0;
+  wrongLog = [];
+  answered = false;
+
+  showView('quiz-play');
+  renderQuestion();
+}
+
+/* ================= KUIS: hasil ================= */
+function finishLevel(){
+  const bagian = bagianList[activeBagianIndex];
+  const lvl = bagian.levels[activeLevelIndex];
+  const pct = Math.round((score / lvl.questions.length) * 100);
+  setLevelBest(bagian.id, lvl.id, pct);
+
+  showView('quiz-result');
+  document.getElementById('resultScore').textContent = `${score}/${lvl.questions.length}`;
+  document.getElementById('resultMsg').textContent = pct === 100
+    ? 'Semua jawaban benar (100%) — lulus!'
+    : `Jawaban benar ${pct}%. Kamu harus mendapatkan 100% untuk membuka kuis berikutnya.`;
+
+  const bannerEl = document.getElementById('resultBanner');
+  bannerEl.className = pct === 100 ? 'result-banner show' : 'result-banner';
+  bannerEl.textContent = pct === 100 ? 'Kuis selesai sempurna! Kembali ke menu pilihan kuis untuk melihat kunci berikutnya.' : 'Belum sempurna. Perbaiki jawaban yang keliru lalu coba lagi.';
+
+  const reviewList = document.getElementById('reviewList');
+  reviewList.innerHTML = '';
+  if(wrongLog.length === 0){
+    document.getElementById('noMistakes').style.display = 'block';
+  } else {
+    document.getElementById('noMistakes').style.display = 'none';
+    wrongLog.forEach(item=>{
+      const div = document.createElement('div');
+      div.className = 'review-item was-wrong';
+      div.innerHTML = `<div class="q">${item.q}</div><div class="fix">Jawaban benar: <strong>${item.correctAnswer}</strong> — ${item.explain}</div>`;
+      reviewList.appendChild(div);
+    });
+  }
+
+  const actions = document.getElementById('resultActions');
+  actions.innerHTML = '';
+  const menuBtn = document.createElement('button');
+  menuBtn.className = 'btn btn-outline';
+  menuBtn.textContent = 'Kembali ke Pilihan Kuis';
+  menuBtn.onclick = ()=> openQuizHome(activeBagianIndex);
+  actions.appendChild(menuBtn);
+
+  if(pct < 100){
+    const retryBtn = document.createElement('button');
+    retryBtn.className = 'btn btn-gold';
+    retryBtn.textContent = 'Coba Lagi';
+    retryBtn.onclick = retryLevel;
+    actions.appendChild(retryBtn);
+  }
+
+  if(pct === 100 && activeLevelIndex === bagian.levels.length - 1){
+    const complete = isBagianComplete(activeBagianIndex);
+    if(complete){
+      const nextIndex = activeBagianIndex + 1;
+      if(nextIndex < bagianList.length){
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn btn-primary';
+        nextBtn.textContent = `Buka ${bagianList[nextIndex].title} →`;
+        nextBtn.onclick = ()=> openBagian(nextIndex);
+        actions.appendChild(nextBtn);
+      }
+    }
+  } else if(pct === 100){
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn btn-primary';
+    nextBtn.textContent = 'Kembali ke Pilihan Kuis →';
+    nextBtn.onclick = ()=> openQuizHome(activeBagianIndex);
+    actions.appendChild(nextBtn);
+  }
+}
+
+/* ================= JELAJAH (game menjelajah per bagian) ================= */
+bagianList[0].explore = {
+  theme:'Hutan Bilangan Rasional',
+  emoji:'🌲',
+  deco:'🌲',
+  ground:['#1c4a45','#205550'],
+  desc:'Jelajahi hutan dan kenali dunia bilangan rasional.',
+  stations:[
+
+    {
+      "x": 80, "y": 90,
+      "q": "Manakah yang merupakan bilangan rasional?",
+      "options": ["1/2", "√2", "π", "√3"],
+      "correct": 0,
+      "explain": "Bilangan rasional adalah bilangan yang dapat ditulis dalam bentuk a/b dengan a dan b bilangan bulat serta b ≠ 0. Contohnya adalah 1/2."
+    },
+
+    {
+      "x": 200, "y": 140,
+      "q": "Bentuk umum bilangan rasional adalah ...",
+      "options": ["a + b", "a/b dengan b ≠ 0", "a × b", "a²"],
+      "correct": 1,
+      "explain": "Bilangan rasional dapat ditulis dalam bentuk a/b, dengan a dan b bilangan bulat dan b tidak sama dengan 0."
+    },
+
+    {
+      "x": 330, "y": 90,
+      "q": "Manakah yang termasuk bilangan bulat sekaligus bilangan rasional?",
+      "options": ["3", "√5", "π", "√7"],
+      "correct": 0,
+      "explain": "Bilangan bulat seperti 3 juga merupakan bilangan rasional karena dapat ditulis sebagai 3/1."
+    },
+
+    {
+      "x": 460, "y": 140,
+      "q": "Pecahan 6/8 jika disederhanakan menjadi ...",
+      "options": ["2/3", "3/4", "4/6", "1/2"],
+      "correct": 1,
+      "explain": "FPB dari 6 dan 8 adalah 2. Jadi 6/8 = (6÷2)/(8÷2) = 3/4."
+    },
+
+    {
+      "x": 590, "y": 90,
+      "q": "Bilangan desimal 0,5 dapat ditulis sebagai ...",
+      "options": ["1/2", "1/5", "5/100", "2/5"],
+      "correct": 0,
+      "explain": "0,5 = 5/10. Sederhanakan dengan membagi 5, sehingga menjadi 1/2."
+    },
+
+    {
+      "x": 630, "y": 250,
+      "q": "Pecahan −3/4 termasuk bilangan rasional karena ...",
+      "options": [
+        "Memiliki tanda negatif",
+        "Dapat ditulis dalam bentuk a/b",
+        "Penyebutnya 4",
+        "Pembilangnya lebih kecil"
+      ],
+      "correct": 1,
+      "explain": "−3/4 merupakan bilangan rasional karena dapat ditulis dalam bentuk a/b dengan −3 dan 4 merupakan bilangan bulat dan penyebutnya bukan 0."
+    },
+
+    {
+      "x": 500, "y": 300,
+      "q": "Manakah pecahan yang senilai dengan 2/3?",
+      "options": ["3/4", "4/6", "5/6", "2/6"],
+      "correct": 1,
+      "explain": "2/3 × 2/2 = 4/6. Jadi 4/6 merupakan pecahan yang senilai dengan 2/3."
+    },
+
+    {
+      "x": 370, "y": 250,
+      "q": "Manakah yang merupakan bilangan rasional dalam bentuk desimal?",
+      "options": ["0,75", "√2", "π", "√5"],
+      "correct": 0,
+      "explain": "0,75 merupakan desimal berhingga sehingga dapat ditulis sebagai pecahan 75/100 = 3/4. Jadi 0,75 adalah bilangan rasional."
+    },
+
+    {
+      "x": 240, "y": 310,
+      "q": "Pecahan 10/5 jika ditulis sebagai bilangan bulat adalah ...",
+      "options": ["1", "2", "5", "10"],
+      "correct": 1,
+      "explain": "10 ÷ 5 = 2. Jadi 10/5 = 2. Bilangan 2 juga merupakan bilangan rasional karena dapat ditulis sebagai 2/1."
+    },
+
+    {
+      "x": 110, "y": 370,
+      "q": "Manakah yang BUKAN merupakan bilangan rasional?",
+      "options": ["−2", "3/5", "0,25", "√2"],
+      "correct": 3,
+      "explain": "√2 merupakan bilangan irasional karena tidak dapat dinyatakan tepat dalam bentuk a/b dengan a dan b bilangan bulat."
+    }
+
+  ]
+};
+
+
+bagianList[1].explore = {
+  theme:'Jembatan Penjumlahan',
+  emoji:'🌉',
+  deco:'➕',
+  ground:['#315c75','#39708a'],
+  desc:'Lewati jembatan dengan menyelesaikan penjumlahan dan pengurangan bilangan rasional.',
+  stations:[
+
+    {
+      "x": 80, "y": 90,
+      "q": "1/5 + 2/5 = ?",
+      "options": ["3/5", "3/10", "2/5", "1/5"],
+      "correct": 0,
+      "explain": "Penyebut sudah sama, jadi pembilang dijumlahkan: 1 + 2 = 3. Hasilnya 3/5."
+    },
+
+    {
+      "x": 200, "y": 140,
+      "q": "5/6 − 1/6 = ?",
+      "options": ["1/6", "2/3", "4/12", "1"],
+      "correct": 1,
+      "explain": "5/6 − 1/6 = 4/6. Sederhanakan dengan membagi 2, sehingga hasilnya 2/3."
+    },
+
+    {
+      "x": 330, "y": 90,
+      "q": "1/4 + 1/6 = ?",
+      "options": ["5/12", "2/10", "1/5", "2/24"],
+      "correct": 0,
+      "explain": "KPK dari 4 dan 6 adalah 12. Jadi 1/4 = 3/12 dan 1/6 = 2/12. Maka 3/12 + 2/12 = 5/12."
+    },
+
+    {
+      "x": 460, "y": 140,
+      "q": "3/4 − 1/2 = ?",
+      "options": ["1/4", "2/4", "1/2", "3/2"],
+      "correct": 0,
+      "explain": "Ubah 1/2 menjadi 2/4. Jadi 3/4 − 2/4 = 1/4."
+    },
+
+    {
+      "x": 590, "y": 90,
+      "q": "2/3 + 1/4 = ?",
+      "options": ["3/7", "8/12", "11/12", "7/12"],
+      "correct": 2,
+      "explain": "KPK dari 3 dan 4 adalah 12. 2/3 = 8/12 dan 1/4 = 3/12. Jadi 8/12 + 3/12 = 11/12."
+    },
+
+    {
+      "x": 630, "y": 250,
+      "q": "5/8 − 1/4 = ?",
+      "options": ["1/8", "3/8", "4/8", "1/2"],
+      "correct": 1,
+      "explain": "1/4 = 2/8. Maka 5/8 − 2/8 = 3/8."
+    },
+
+    {
+      "x": 500, "y": 300,
+      "q": "−2/5 + 1/5 = ?",
+      "options": ["−1/5", "1/5", "−3/5", "3/5"],
+      "correct": 0,
+      "explain": "Karena penyebut sama, jumlahkan pembilang: −2 + 1 = −1. Jadi hasilnya −1/5."
+    },
+
+    {
+      "x": 370, "y": 250,
+      "q": "1 1/2 + 2 1/4 = ?",
+      "options": ["3 3/4", "3 1/4", "4", "2 3/4"],
+      "correct": 0,
+      "explain": "1 1/2 = 1 2/4. Kemudian 1 2/4 + 2 1/4 = 3 3/4."
+    },
+
+    {
+      "x": 240, "y": 310,
+      "q": "Dina memiliki 5/6 meter pita. Ia menggunakan 1/3 meter. Berapa meter pita yang tersisa?",
+      "options": ["1/2 m", "2/3 m", "1/3 m", "5/9 m"],
+      "correct": 0,
+      "explain": "1/3 = 2/6. Jadi 5/6 − 2/6 = 3/6 = 1/2 meter."
+    },
+
+    {
+      "x": 110, "y": 370,
+      "q": "Suhu pagi hari −2°C. Siang hari naik 5°C. Berapa suhu siang hari?",
+      "options": ["−7°C", "−3°C", "3°C", "7°C"],
+      "correct": 2,
+      "explain": "Suhu awal −2°C kemudian naik 5°C: −2 + 5 = 3°C."
+    }
+
+  ]
+};
+
+
+bagianList[2].explore = {
+  theme:'Pegunungan Perkalian',
+  emoji:'⛰️',
+  deco:'✖️',
+  ground:['#394d3b','#4d6549'],
+  desc:'Naiki pegunungan dengan menyelesaikan perkalian dan pembagian bilangan rasional.',
+  stations:[
+
+    {
+      "x": 80, "y": 90,
+      "q": "2/3 × 3/4 = ?",
+      "options": ["5/7", "6/7", "1/4", "1/2"],
+      "correct": 3,
+      "explain": "Kalikan pembilang dan penyebut: 2/3 × 3/4 = 6/12. Sederhanakan menjadi 1/2."
+    },
+
+    {
+      "x": 200, "y": 140,
+      "q": "3/5 × 10 = ?",
+      "options": ["30", "6", "3", "15"],
+      "correct": 1,
+      "explain": "3/5 × 10 = 30/5 = 6."
+    },
+
+    {
+      "x": 330, "y": 90,
+      "q": "1/2 × 4/5 = ?",
+      "options": ["2/5", "4/10", "1/10", "5/8"],
+      "correct": 0,
+      "explain": "1/2 × 4/5 = 4/10. Sederhanakan dengan membagi 2 menjadi 2/5."
+    },
+
+    {
+      "x": 460, "y": 140,
+      "q": "3/4 ÷ 3/8 = ?",
+      "options": ["1/2", "9/32", "2", "1 1/2"],
+      "correct": 2,
+      "explain": "Dalam pembagian pecahan, ubah menjadi perkalian dengan membalik pecahan kedua: 3/4 × 8/3 = 24/12 = 2."
+    },
+
+    {
+      "x": 590, "y": 90,
+      "q": "2/5 ÷ 1/5 = ?",
+      "options": ["1/2", "2", "5", "1/5"],
+      "correct": 1,
+      "explain": "2/5 ÷ 1/5 = 2/5 × 5/1 = 10/5 = 2."
+    },
+
+    {
+      "x": 630, "y": 250,
+      "q": "4/7 × 14/3 = ?",
+      "options": ["8/3", "56/21", "2/3", "4/3"],
+      "correct": 0,
+      "explain": "4/7 × 14/3 = 56/21. Sederhanakan dengan membagi 7 sehingga menjadi 8/3."
+    },
+
+    {
+      "x": 500, "y": 300,
+      "q": "5/6 ÷ 5/12 = ?",
+      "options": ["1/2", "2", "5/2", "10"],
+      "correct": 1,
+      "explain": "5/6 ÷ 5/12 = 5/6 × 12/5 = 60/30 = 2."
+    },
+
+    {
+      "x": 370, "y": 250,
+      "q": "1 1/2 × 2/3 = ?",
+      "options": ["1", "2", "3/2", "1/2"],
+      "correct": 0,
+      "explain": "Ubah 1 1/2 menjadi 3/2. Kemudian 3/2 × 2/3 = 6/6 = 1."
+    },
+
+    {
+      "x": 240, "y": 310,
+      "q": "Ibu memiliki 3/4 kg tepung. Tepung tersebut dibagi menjadi 3 bagian sama banyak. Berapa kg setiap bagian?",
+      "options": ["1/4 kg", "1/3 kg", "3/7 kg", "1/2 kg"],
+      "correct": 0,
+      "explain": "3/4 ÷ 3 = 3/4 × 1/3 = 3/12 = 1/4 kg."
+    },
+
+    {
+      "x": 110, "y": 370,
+      "q": "Sebuah resep membutuhkan 2/3 liter susu. Jika resep dibuat setengah kali, susu yang diperlukan adalah ...",
+      "options": ["1/3 liter", "2/5 liter", "1/2 liter", "4/3 liter"],
+      "correct": 0,
+      "explain": "Setengah dari 2/3 adalah 1/2 × 2/3 = 2/6 = 1/3 liter."
+    }
+
+  ]
+};
+
+
+bagianList[3].explore = {
+  theme:'Kastil Operasi Campuran',
+  emoji:'🏰',
+  deco:'⭐',
+  ground:['#42366b','#51437d'],
+  desc:'Tantangan terakhir! Gunakan aturan operasi hitung bilangan rasional.',
+  stations:[
+
+    {
+      "x": 80, "y": 90,
+      "q": "1/2 + 1/4 × 2 = ?",
+      "options": ["3/4", "1", "3/2", "1/2"],
+      "correct": 1,
+      "explain": "Kerjakan perkalian terlebih dahulu: 1/4 × 2 = 1/2. Kemudian 1/2 + 1/2 = 1."
+    },
+
+    {
+      "x": 200, "y": 140,
+      "q": "3/4 − 1/2 × 1/2 = ?",
+      "options": ["1/2", "5/8", "1/4", "3/8"],
+      "correct": 1,
+      "explain": "Kerjakan perkalian terlebih dahulu: 1/2 × 1/2 = 1/4. Kemudian 3/4 − 1/4 = 2/4 = 1/2."
+    },
+
+    {
+      "x": 330, "y": 90,
+      "q": "(1/2 + 1/3) × 6 = ?",
+      "options": ["3", "4", "5", "6"],
+      "correct": 2,
+      "explain": "Kerjakan dalam kurung: 1/2 + 1/3 = 3/6 + 2/6 = 5/6. Kemudian 5/6 × 6 = 5."
+    },
+
+    {
+      "x": 460, "y": 140,
+      "q": "2/3 + 1/2 − 1/6 = ?",
+      "options": ["1", "2/3", "5/6", "4/3"],
+      "correct": 0,
+      "explain": "Samakan penyebut menjadi 6: 4/6 + 3/6 − 1/6 = 6/6 = 1."
+    },
+
+    {
+      "x": 590, "y": 90,
+      "q": "3/5 × 10 − 2 = ?",
+      "options": ["2", "4", "6", "8"],
+      "correct": 1,
+      "explain": "Kerjakan perkalian terlebih dahulu: 3/5 × 10 = 6. Kemudian 6 − 2 = 4."
+    },
+
+    {
+      "x": 630, "y": 250,
+      "q": "1 − 1/2 ÷ 1/4 = ?",
+      "options": ["−1", "0", "1/2", "2"],
+      "correct": 0,
+      "explain": "Kerjakan pembagian terlebih dahulu: 1/2 ÷ 1/4 = 1/2 × 4 = 2. Kemudian 1 − 2 = −1."
+    },
+
+    {
+      "x": 500, "y": 300,
+      "q": "(3/4 − 1/4) × 2 = ?",
+      "options": ["1/2", "1", "3/2", "2"],
+      "correct": 1,
+      "explain": "Kerjakan dalam kurung: 3/4 − 1/4 = 2/4 = 1/2. Kemudian 1/2 × 2 = 1."
+    },
+
+    {
+      "x": 370, "y": 250,
+      "q": "2/3 × 3/4 + 1/2 = ?",
+      "options": ["1/2", "1", "3/4", "5/4"],
+      "correct": 1,
+      "explain": "Kerjakan perkalian terlebih dahulu: 2/3 × 3/4 = 1/2. Kemudian 1/2 + 1/2 = 1."
+    },
+
+    {
+      "x": 240, "y": 310,
+      "q": "Rani memiliki 1 1/2 liter jus. Ia memberikan 1/2 liter kepada temannya, lalu membagi sisa jus ke dalam 2 gelas sama banyak. Berapa liter jus setiap gelas?",
+      "options": ["1/2 liter", "1/4 liter", "1 liter", "3/4 liter"],
+      "correct": 0,
+      "explain": "Pertama, 1 1/2 − 1/2 = 1 liter. Kemudian 1 liter ÷ 2 = 1/2 liter untuk setiap gelas."
+    },
+
+    {
+      "x": 110, "y": 370,
+      "q": "Hasil dari 1/2 + 2/3 × 3/4 − 1/4 adalah ...",
+      "options": ["1/2", "3/4", "1", "5/4"],
+      "correct": 2,
+      "explain": "Kerjakan perkalian terlebih dahulu: 2/3 × 3/4 = 1/2. Kemudian 1/2 + 1/2 − 1/4 = 1 − 1/4 = 3/4."
+    }
+
+  ]
+};
+
+if(!bagianList[3].explore){
+  bagianList[3].explore = {theme:'Operasi Campuran',emoji:'🧮',deco:'➕',ground:['#243b68','#1b2d55'],desc:'Latihan operasi campuran bilangan rasional.',stations:[
+    {x:80,y:90,q:'1 - 1/2 × 2/3 = ?',options:['2/3','1/3','1/2','1/6'],correct:0,explain:'Kerjakan perkalian terlebih dahulu: 1/2 × 2/3 = 1/3, lalu 1 - 1/3 = 2/3.'}
+  ]};
+}
+
+const EX_DECOR = [[40,40,0,34,0],[200,40,1,30,1],[420,40,3,26,2],[690,40,0,34,3],[690,150,1,30,4],[40,160,3,26,5],[250,200,2,24,6],[560,190,0,32,7],[700,330,2,26,8],[40,290,1,32,9],[180,410,0,30,10],[330,390,3,26,11],[470,400,2,26,12],[600,395,1,30,13],[400,190,3,22,14]];
+const EX_DECOS = {1:['🌲','🌳','🍄','🌼'], 2:['🌵','🪨','🌴','🦎'], 3:['🏰','🌷','🚩','🌳']};
+let ex = null;
+
+function exBest(id){ return Number(safeGet('lmf_explore_'+id) || 0); }
+
+function renderExploreGrid(){
+  const grid = document.getElementById('exploreGrid');
+  grid.innerHTML = '';
+  bagianList.forEach((b, i)=>{
+    const d = b.explore, n = d.stations.length;
+    const unlocked = isExploreUnlocked(i);
+    const best = exBest(b.id);
+    let status;
+    if(!isBagianComplete(i)) status = `Terkunci — selesaikan ${b.title} (semua kuis harus 100%)`;
+    else status = best ? `Skor terbaik: ${best}/${n} kristal tepat sekali coba` : 'Belum dijelajahi';
+
+    const card = document.createElement('div');
+    card.className = 'bagian-card' + (unlocked ? '' : ' locked');
+    card.innerHTML = `
+      <div class="bagian-num">${d.emoji}</div>
+      <div class="bagian-info">
+        <h3>${d.theme}</h3>
+        <p>${b.title} — ${d.desc}</p>
+        <div class="bagian-status">${status}</div>
+      </div>
+      <button class="btn ${unlocked ? 'btn-primary' : 'btn-outline'}" ${unlocked ? '' : 'disabled'}>${unlocked ? 'Mulai Jelajah' : 'Terkunci'}</button>
+    `;
+    if(unlocked) card.querySelector('button').onclick = ()=> openExplore(i);
+    grid.appendChild(card);
+  });
+}
+
+function openExplore(i){
+  if(!isExploreUnlocked(i)) return;
+  stopExplore();
+  const b = bagianList[i], d = b.explore;
+  ex = {vx:0, vy:0, face:1, parts:[], hopT:-9, i, b, d, px:50, py:180, keys:{}, moving:false, near:null, modal:false, cur:null, solved:0, score:0, t:0, raf:0,
+        st: d.stations.map(s=>({...s, done:false, first:true}))};
+  showView('explore-play');
+  document.getElementById('exTitle').textContent = `${b.title} · ${d.theme}`;
+  document.getElementById('exModal').classList.remove('show');
+  updateExHud();
+  ex.raf = requestAnimationFrame(exLoop);
+}
+function stopExplore(){
+  if(ex && ex.raf){ cancelAnimationFrame(ex.raf); ex.raf = 0; }
+}
+function leaveExplore(){
+  stopExplore();
+  showView('explore-list');
+  renderExploreGrid();
+}
+function updateExHud(){
+  const n = ex.st.length;
+  document.getElementById('exScore').textContent = `💎 ${ex.solved}/${n}`;
+  document.getElementById('exFill').style.width = (ex.solved/n*100) + '%';
+  const h = document.getElementById('exHint');
+  if(h) h.textContent = ex.solved < n ? `Langkah ${ex.solved+1} dari ${n}: temukan kristal bernomor ${ex.solved+1} (yang menyala). Gerak dengan panah/WASD, lalu tekan E atau Spasi.` : 'Semua langkah selesai!';
+}
+
+function exBurst(x,y,n){
+  const cols=['#ecd39a','#8fb4ff','#ff9ecb','#8ff0b0','#ffffff'];
+  for(let i=0;i<(n||30);i++){
+    const a=Math.random()*6.283, sp=1.5+Math.random()*3.8;
+    ex.parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.11,life:1,dec:.012+Math.random()*.01,c:cols[i%5],s:2+Math.random()*3,star:i%3===0});
+  }
+}
+function exPuff(x,y){
+  for(let i=0;i<8;i++) ex.parts.push({x,y,vx:(Math.random()-.5)*2,vy:-Math.random()*1.5,g:-.02,life:1,dec:.03,c:'#dfe6f5',s:4+Math.random()*3});
+}
+function rr(g,x,y,w,h,r){
+  g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();
+}
+
+function exLoop(ts){
+  if(!ex || !ex.raf) return;
+  ex.t = ts;
+  ex.active = ex.st.find(s => !s.done) || null;
+  if(!ex.modal){
+    const k = ex.keys;
+    let dx = (k.right?1:0) - (k.left?1:0), dy = (k.down?1:0) - (k.up?1:0);
+    if(dx && dy){ dx *= .7071; dy *= .7071; }
+    ex.vx += (dx*3.6 - ex.vx)*.18; ex.vy += (dy*3.6 - ex.vy)*.18;
+    ex.px = Math.max(24, Math.min(696, ex.px + ex.vx));
+    ex.py = Math.max(42, Math.min(418, ex.py + ex.vy));
+    ex.moving = Math.hypot(ex.vx, ex.vy) > .6;
+    if(ex.vx > .3) ex.face = 1; else if(ex.vx < -.3) ex.face = -1;
+    if(ex.moving && Math.random() < .35) ex.parts.push({x:ex.px-ex.face*6,y:ex.py+20,vx:(Math.random()-.5)*.8,vy:-Math.random()*.6,g:0,life:.8,dec:.04,c:'#ffffff',s:3+Math.random()*2});
+    ex.near = ex.active && Math.hypot(ex.active.x-ex.px, ex.active.y-ex.py) < 46 ? ex.active : null;
+  } else { ex.vx = ex.vy = 0; ex.moving = false; }
+  if(Math.random() < (ex.moving ? .4 : .08)) ex.parts.push({x:ex.px+ex.face*24+(Math.random()-.5)*4,y:ex.py-14+(Math.random()-.5)*4,vx:(Math.random()-.5)*.6,vy:-.4-Math.random()*.6,g:.01,life:1,dec:.03,c:'#ecd39a',s:2+Math.random()*2,star:true});
+  ex.parts.forEach(q=>{ q.x+=q.vx; q.y+=q.vy; q.vy+=q.g; q.life-=q.dec; });
+  ex.parts = ex.parts.filter(q=>q.life>0).slice(-320);
+  exDraw();
+  ex.raf = requestAnimationFrame(exLoop);
+}
+
+function exWizard(g,x,y,t,moving,face,hop){
+  const w = t*(moving?13:2.5), sw = Math.sin(w), bob = moving ? -Math.abs(sw)*5 : Math.sin(t*3)*1.5;
+  g.fillStyle='rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(x,y+23,14-(hop?-hop*.2:0),4,0,0,7); g.fill();
+  g.save(); g.translate(x,y+bob+hop); g.scale(face,1); g.lineCap='round';
+  g.fillStyle='#0d1f4d'; g.beginPath(); g.moveTo(-7,-6); g.quadraticCurveTo(-20-(moving?5:0)+Math.sin(w*.5)*3,6,-12,19); g.lineTo(-2,16); g.closePath(); g.fill();
+  g.fillStyle='#4a2d1a';
+  g.beginPath(); g.ellipse(moving?-6+sw*5:-6,20,5,3,0,0,7); g.fill();
+  g.beginPath(); g.ellipse(moving?6-sw*5:6,20,5,3,0,0,7); g.fill();
+  g.strokeStyle='#2452c4'; g.lineWidth=5;
+  g.beginPath(); g.moveTo(-8,0); g.lineTo(-13-(moving?sw*3:0),9+(moving?sw*3:0)); g.stroke();
+  g.fillStyle='#2f63e0'; g.beginPath(); g.ellipse(0,6,12,15,0,0,7); g.fill();
+  g.fillStyle='#ecd39a'; g.fillRect(-10.5,5,21,3);
+  const hx=15+(moving?sw*2:0), hy=-4+(moving?-sw*3:Math.sin(t*3)*1.5);
+  g.strokeStyle='#2f63e0'; g.lineWidth=5; g.beginPath(); g.moveTo(8,0); g.lineTo(hx,hy); g.stroke();
+  g.strokeStyle='#ecd39a'; g.lineWidth=2.5; g.beginPath(); g.moveTo(hx,hy); g.lineTo(hx+9,hy-9); g.stroke();
+  g.fillStyle='#fff6d0'; g.beginPath(); g.arc(hx+9,hy-9,2.5+Math.sin(t*8),0,7); g.fill();
+  g.fillStyle='#ffdcb8'; g.beginPath(); g.arc(hx,hy,3,0,7); g.fill();
+  g.beginPath(); g.arc(0,-14,11,0,7); g.fill();
+  g.fillStyle='#5a3a22'; g.beginPath(); g.arc(0,-17,11,Math.PI*1.05,Math.PI*1.95); g.fill();
+  if((t%3.4) < .13){ g.strokeStyle='#14213f'; g.lineWidth=1.5; g.beginPath(); g.moveTo(-1,-13); g.lineTo(3,-13); g.moveTo(5,-13); g.lineTo(9,-13); g.stroke(); }
+  else { g.fillStyle='#14213f'; g.beginPath(); g.arc(1,-13,1.9,0,7); g.arc(7,-13,1.9,0,7); g.fill(); }
+  g.fillStyle='rgba(255,120,140,.45)'; g.beginPath(); g.arc(9.5,-9,2.6,0,7); g.arc(-2,-9,2.6,0,7); g.fill();
+  g.strokeStyle='#a0522d'; g.lineWidth=1.5; g.beginPath(); g.arc(4,-10,3,.15*Math.PI,.85*Math.PI); g.stroke();
+  g.fillStyle='#173a9a'; g.beginPath(); g.ellipse(0,-21,16,4.5,0,0,7); g.fill();
+  g.fillStyle='#1f4fbf'; g.beginPath(); g.moveTo(-11,-22); g.quadraticCurveTo(-3,-36,7+Math.sin(t*4)*2.5,-50); g.quadraticCurveTo(5,-34,11,-22); g.closePath(); g.fill();
+  g.fillStyle='#ecd39a'; g.fillRect(-11,-25,22,3.5);
+  g.beginPath(); g.arc(1,-34,2.2,0,7); g.fill();
+  g.restore();
+}
+
+function exDraw(){
+  const c = document.getElementById('exCanvas'), g = c.getContext('2d'), d = ex.d, W = 720, H = 440, t = ex.t/1000;
+  const bg = g.createLinearGradient(0,0,0,H); bg.addColorStop(0,d.ground[1]); bg.addColorStop(1,d.ground[0]);
+  g.fillStyle = bg; g.fillRect(0,0,W,H);
+  [[120,90,170],[600,120,190],[360,230,230],[140,360,170],[580,350,180]].forEach(b=>{
+    const r = g.createRadialGradient(b[0],b[1],0,b[0],b[1],b[2]);
+    r.addColorStop(0,'rgba(255,255,255,.09)'); r.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle = r; g.fillRect(0,0,W,H);
+  });
+  // jalan setapak berkelok menghubungkan kristal
+  const ps = ex.st;
+  const mid = (p,q)=>({x:(p.x+q.x)/2,y:(p.y+q.y)/2});
+  g.beginPath(); g.moveTo(ex.startX||50, ex.startY||180); g.lineTo(ps[0].x,ps[0].y);
+  for(let i=1;i<ps.length-1;i++){ const m = mid(ps[i],ps[i+1]); g.quadraticCurveTo(ps[i].x,ps[i].y,m.x,m.y); }
+  g.lineTo(ps[ps.length-1].x,ps[ps.length-1].y);
+  g.lineCap='round'; g.lineJoin='round';
+  g.strokeStyle='rgba(255,244,214,.16)'; g.lineWidth=40; g.stroke();
+  g.setLineDash([2,13]); g.strokeStyle='rgba(255,244,214,.3)'; g.lineWidth=3; g.stroke(); g.setLineDash([]);
+  // dekorasi bergoyang
+  const dk = EX_DECOS[ex.b.id];
+  g.textAlign='center'; g.textBaseline='middle';
+  EX_DECOR.forEach(o=>{
+    g.fillStyle='rgba(0,0,0,.18)'; g.beginPath(); g.ellipse(o[0],o[1]+o[3]/2,o[3]*.4,o[3]*.12,0,0,7); g.fill();
+    g.save(); g.translate(o[0],o[1]+o[3]/2); g.rotate(Math.sin(t*1.6+o[4])*.06);
+    g.font = o[3]+'px serif'; g.fillText(dk[o[2]%dk.length],0,-o[3]/2); g.restore();
+  });
+  // kristal
+  ex.st.forEach((s,i)=>{
+    const near = ex.near === s, locked = !s.done && s !== ex.active, bob = Math.sin(t*2.5+i)*4, r = near ? 22 : 19, cy = s.y+bob-6; g.globalAlpha = locked ? .55 : 1;
+    g.fillStyle='rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(s.x,s.y+22,16-bob*.5,4,0,0,7); g.fill();
+    const gl = g.createRadialGradient(s.x,cy,2,s.x,cy,r+26);
+    gl.addColorStop(0,s.done?'rgba(120,255,180,.55)':(locked?'rgba(150,160,190,.12)':'rgba(160,200,255,.6)')); gl.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=gl; g.beginPath(); g.arc(s.x,cy,r+26,0,7); g.fill();
+    const cg = g.createLinearGradient(s.x-r,cy-r,s.x+r,cy+r);
+    cg.addColorStop(0,s.done?'#c4f7d8':(locked?'#d3d9e8':'#cfe0ff')); cg.addColorStop(1,s.done?'#2f9461':(locked?'#6b7799':'#3868e0'));
+    g.fillStyle=cg; g.beginPath(); g.moveTo(s.x,cy-r*1.35); g.lineTo(s.x+r*.85,cy); g.lineTo(s.x,cy+r*1.1); g.lineTo(s.x-r*.85,cy); g.closePath(); g.fill();
+    g.strokeStyle='#fff'; g.lineWidth=2; g.stroke();
+    g.fillStyle='rgba(255,255,255,.35)'; g.beginPath(); g.moveTo(s.x,cy-r*1.35); g.lineTo(s.x-r*.85,cy); g.lineTo(s.x-r*.2,cy); g.closePath(); g.fill();
+    g.fillStyle='#081436'; g.font='700 17px Fredoka, sans-serif'; g.fillText(s.done?'✔':(locked?'🔒':(i+1)),s.x,cy+1);
+    if(!s.done && !locked) for(let k=0;k<3;k++){
+      const an = t*2+k*2.09; g.fillStyle='#fff6d0'; g.font='11px serif';
+      g.fillText('✦', s.x+Math.cos(an)*(r+13), cy+Math.sin(an)*(r+9));
+    }
+    if(!s.done && !locked && !near){
+      g.fillStyle='#ecd39a'; g.font='700 18px Nunito, sans-serif'; g.fillText('▼',s.x,cy-r-22+Math.sin(t*5)*4);
+    }
+    if(near){
+      const by = cy-r-34+Math.sin(t*6)*2;
+      g.fillStyle='#ecd39a'; rr(g,s.x-46,by-12,92,24,12); g.fill();
+      g.beginPath(); g.moveTo(s.x-5,by+11); g.lineTo(s.x+5,by+11); g.lineTo(s.x,by+18); g.closePath(); g.fill();
+      g.fillStyle='#081436'; g.font='700 12px Nunito, sans-serif'; g.fillText('Tekan E / Spasi',s.x,by+1);
+    }
+  });
+  g.globalAlpha = 1;
+  // kunang-kunang
+  for(let i=0;i<14;i++){
+    const fx = 360+Math.sin(t*.3+i*2.1)*330, fy = 220+Math.cos(t*.4+i*1.7)*190, a = .35+.35*Math.sin(t*2+i);
+    const fg = g.createRadialGradient(fx,fy,0,fx,fy,9);
+    fg.addColorStop(0,'rgba(255,240,150,'+a+')'); fg.addColorStop(1,'rgba(255,240,150,0)');
+    g.fillStyle=fg; g.beginPath(); g.arc(fx,fy,9,0,7); g.fill();
+  }
+  // karakter
+  const ht = t - ex.hopT, hop = ht < .7 ? -Math.abs(Math.sin(ht*9))*14 : 0;
+  exWizard(g, ex.px, ex.py, t, ex.moving, ex.face, hop);
+  // partikel
+  ex.parts.forEach(q=>{
+    g.globalAlpha = Math.max(0,q.life); g.fillStyle = q.c;
+    if(q.star){ g.font = (q.s*4)+'px serif'; g.fillText('✦',q.x,q.y); }
+    else { g.beginPath(); g.arc(q.x,q.y,q.s,0,7); g.fill(); }
+  });
+  g.globalAlpha = 1;
+  const vg = g.createRadialGradient(360,220,240,360,220,460);
+  vg.addColorStop(0,'rgba(5,13,36,0)'); vg.addColorStop(1,'rgba(5,13,36,.45)');
+  g.fillStyle = vg; g.fillRect(0,0,W,H);
+}
+
+function exAction(){
+  if(!ex || !ex.raf || ex.modal || !ex.near) return;
+  openStation(ex.near);
+}
+function openStation(s){
+  ex.modal = true; ex.cur = s; ex.keys = {};
+  document.getElementById('exQ').textContent = `Langkah ${ex.solved+1}/${ex.st.length} · ${s.q}`;
+  const opts = document.getElementById('exOpts');
+  opts.innerHTML = '';
+  s.options.forEach((o, i)=>{
+    const b = document.createElement('button');
+    b.className = 'opt'; b.textContent = o;
+    b.onclick = ()=> answerStation(i);
+    opts.appendChild(b);
+  });
+  document.getElementById('exFb').className = 'feedback';
+  document.getElementById('exNextBtn').style.display = 'none';
+  document.getElementById('exModal').classList.add('show');
+}
+function answerStation(i){
+  const s = ex.cur, buttons = document.querySelectorAll('#exOpts .opt');
+  buttons.forEach(b => b.disabled = true);
+  const ok = i === s.correct;
+  const fb = document.getElementById('exFb');
+  if(ok){
+    buttons[i].classList.add('correct-pick');
+    s.done = true; ex.solved++; exBurst(s.x, s.y-6); ex.hopT = ex.t/1000;
+    if(s.first) ex.score++;
+    fb.className = 'feedback show ok';
+    document.getElementById('exFbTitle').textContent = 'Benar! Kristal terkumpul ✨';
+    document.getElementById('exFbText').textContent = s.explain;
+    document.getElementById('exNextBtn').textContent = 'Lanjut menjelajah →';
+  } else {
+    buttons[i].classList.add('wrong-pick');
+    buttons[s.correct].classList.add('reveal-correct');
+    s.first = false; exPuff(s.x, s.y-6);
+    fb.className = 'feedback show no';
+    document.getElementById('exFbTitle').textContent = 'Kurang tepat — ini pembenarannya:';
+    document.getElementById('exFbText').textContent = `Jawaban yang tepat adalah "${s.options[s.correct]}". ${s.explain} Kristal ini bisa dicoba lagi.`;
+    document.getElementById('exNextBtn').textContent = 'Kembali menjelajah →';
+  }
+  document.getElementById('exNextBtn').style.display = 'inline-block';
+  updateExHud();
+}
+function closeStation(){
+  document.getElementById('exModal').classList.remove('show');
+  ex.modal = false; ex.cur = null;
+  if(ex.solved === ex.st.length) finishExplore();
+}
+function finishExplore(){
+  const n = ex.st.length, id = ex.b.id;
+  if(ex.score > exBest(id)) safeSet('lmf_explore_'+id, ex.score);
+  document.getElementById('exQ').textContent = `Semua kristal terkumpul! ${ex.score}/${n} benar sekali coba.`;
+  const opts = document.getElementById('exOpts');
+  opts.innerHTML = '';
+  const again = document.createElement('button');
+  again.className = 'btn btn-gold'; again.textContent = 'Jelajah Lagi';
+  again.onclick = ()=> openExplore(ex.i);
+  const back = document.createElement('button');
+  back.className = 'btn btn-outline'; back.textContent = 'Kembali ke Daftar';
+  back.onclick = leaveExplore;
+  opts.appendChild(again); opts.appendChild(back);
+  document.getElementById('exFb').className = 'feedback';
+  document.getElementById('exNextBtn').style.display = 'none';
+  document.getElementById('exModal').classList.add('show');
+  ex.modal = true; ex.hopT = ex.t/1000;
+  [[180,200],[360,150],[540,200],[360,300]].forEach(q=>exBurst(q[0],q[1],40));
+}
+
+/* kontrol keyboard & layar sentuh */
+const EX_KEYMAP = {arrowleft:'left',a:'left',arrowright:'right',d:'right',arrowup:'up',w:'up',arrowdown:'down',s:'down'};
+window.addEventListener('keydown', e=>{
+  if(!ex || !ex.raf) return;
+  const k = e.key.toLowerCase();
+  if(EX_KEYMAP[k]){ if(!ex.modal) ex.keys[EX_KEYMAP[k]] = true; e.preventDefault(); }
+  else if((k === 'e' || k === ' ') && !ex.modal){ e.preventDefault(); exAction(); }
+});
+window.addEventListener('keyup', e=>{
+  if(!ex) return;
+  const k = e.key.toLowerCase();
+  if(EX_KEYMAP[k]) ex.keys[EX_KEYMAP[k]] = false;
+});
+document.querySelectorAll('.dp').forEach(btn=>{
+  const press = e=>{
+    e.preventDefault();
+    if(!ex) return;
+    if(btn.dataset.act) exAction(); else ex.keys[btn.dataset.dir] = true;
+  };
+  const release = ()=>{ if(ex && btn.dataset.dir) ex.keys[btn.dataset.dir] = false; };
+  btn.addEventListener('pointerdown', press);
+  ['pointerup','pointerleave','pointercancel'].forEach(ev => btn.addEventListener(ev, release));
+});
+document.querySelector('nav.links button[data-view="explore-list"]').addEventListener('click', renderExploreGrid);
+renderExploreGrid();
+
+/* refresh peta belajar tiap kali dibuka lewat nav */
+document.querySelector('nav.links button[data-view="bagian-list"]').addEventListener('click', renderBagianGrid);
+
+/* ================= INIT ================= */
+renderBagianGrid();
+if(isLoggedIn()){
+  applyLoggedInUI();
+  showView('home');
+} else {
+  showView('login');
+}
+</script>
+
+</body>
+</html>
