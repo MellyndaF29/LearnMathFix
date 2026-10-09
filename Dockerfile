@@ -48,7 +48,3 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 # Buka port 80
 EXPOSE 80
-
-# Saat server menyala di Render, cache semua konfigurasi agar ENV terbaca oleh Apache
-CMD sh -c "php artisan config:cache && php artisan route:cache && php artisan view:cache && apache2-foreground"
-
