@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: learnmathfix
+    env: php
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "heroku-php-apache2 public/"
+    envVars:
+      - key: APP_NAME
+        value: LearnMathFix
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DATABASE_URL
+        sync: false
