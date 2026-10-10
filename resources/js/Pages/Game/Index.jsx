@@ -10,7 +10,7 @@ export default function Game({ auth, stages }) {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Game Jelajah" />
+            <Head title="Pilihan Peta" />
 
             {/* Page header */}
             <div className="relative overflow-hidden rounded-[24px] px-8 py-7 mb-8"
@@ -27,13 +27,13 @@ export default function Game({ auth, stages }) {
                         <p className="text-bronze-light text-xs font-bold uppercase tracking-widest mb-1">
                             Petualangan Matematika
                         </p>
-                        <h1 className="font-cinzel text-2xl font-bold text-white mb-1">Game Jelajah</h1>
-                        <p className="text-white/50 text-sm">Selesaikan setiap level untuk membuka yang berikutnya</p>
+                        <h1 className="font-cinzel text-2xl font-bold text-white mb-1">Pilihan Peta</h1>
+                        <p className="text-white/50 text-sm">Pilih peta untuk dijelajahi dan selesaikan tantangan di dalamnya</p>
                     </div>
                     <div className="flex gap-4 sm:text-right">
                         <div className="text-center">
                             <div className="font-cinzel text-2xl font-bold text-bronze-light">{completedCount}/{stages.length}</div>
-                            <div className="text-white/40 text-[11px] uppercase tracking-wide">Level Selesai</div>
+                            <div className="text-white/40 text-[11px] uppercase tracking-wide">Peta Selesai</div>
                         </div>
                         <div className="w-px bg-white/10" />
                         <div className="text-center">
@@ -83,7 +83,7 @@ export default function Game({ auth, stages }) {
                                 <div className="flex items-start justify-between mb-4">
                                     <div>
                                         <p className="text-bronze-light/80 text-[10px] font-bold uppercase tracking-widest mb-0.5">
-                                            Level {stage.stage}
+                                            Peta {stage.stage}
                                         </p>
                                         <h3 className="font-cinzel text-base font-bold text-white leading-tight">
                                             {stage.label}
@@ -138,7 +138,7 @@ export default function Game({ auth, stages }) {
                                               color: '#fff',
                                               border: '1px solid rgba(201,164,92,0.25)',
                                           }}>
-                                        {done ? 'Main Lagi' : 'Mulai Level'}
+                                        {done ? 'Jelajahi Lagi' : 'Pilih Peta'}
                                     </Link>
                                 )}
                             </div>

@@ -51,6 +51,28 @@ class AdminController extends Controller
         ]);
     }
 
+    public function createUser(): Response
+    {
+        return Inertia::render('Admin/Users/Create');
+    }
+
+    public function storeUser(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+        ]);
+
+        return redirect()->route('admin.users')->with('success', 'Pengguna berhasil ditambahkan.');
+    }
+
     public function toggleAdmin(User $user): RedirectResponse
     {
         $user->update(['is_admin' => ! $user->is_admin]);
@@ -238,6 +260,7 @@ class AdminController extends Controller
             'explanation' => 'nullable|string',
             'type' => ['required', Rule::in(['multiple_choice', 'true_false'])],
             'difficulty' => ['required', Rule::in(['Mudah', 'Sedang', 'Sulit'])],
+            'quiz_level' => 'required|integer|min:1|max:3',
             'order' => 'nullable|integer|min:0',
         ]);
 
@@ -245,9 +268,9 @@ class AdminController extends Controller
         $correctAnswerKey = '';
         $labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         foreach (array_values($validated['options']) as $index => $opt) {
-            $key = $labels[$index] ?? (string)$index;
+            $key = $labels[$index] ?? (string) $index;
             $options[$key] = $opt;
-            if ((string)$opt === (string)$validated['correct_answer']) {
+            if ((string) $opt === (string) $validated['correct_answer']) {
                 $correctAnswerKey = $key;
             }
         }
@@ -279,6 +302,7 @@ class AdminController extends Controller
             'explanation' => 'nullable|string',
             'type' => ['required', Rule::in(['multiple_choice', 'true_false'])],
             'difficulty' => ['required', Rule::in(['Mudah', 'Sedang', 'Sulit'])],
+            'quiz_level' => 'required|integer|min:1|max:3',
             'order' => 'nullable|integer|min:0',
         ]);
 
@@ -286,9 +310,9 @@ class AdminController extends Controller
         $correctAnswerKey = '';
         $labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         foreach (array_values($validated['options']) as $index => $opt) {
-            $key = $labels[$index] ?? (string)$index;
+            $key = $labels[$index] ?? (string) $index;
             $options[$key] = $opt;
-            if ((string)$opt === (string)$validated['correct_answer']) {
+            if ((string) $opt === (string) $validated['correct_answer']) {
                 $correctAnswerKey = $key;
             }
         }

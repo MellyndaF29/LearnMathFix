@@ -10,10 +10,19 @@ use App\Http\Controllers\QuizController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Welcome / Landing
+// Redirect root to dashboard if authenticated, else show BeliAkun landing page
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return Inertia::render('BeliAkun');
 })->name('home');
+
+// Informasi cara mendapatkan akun (publik)
+Route::get('/beli-akun', function () {
+    return redirect('/');
+})->name('beli.akun');
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -34,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Game Jelajah
     Route::get('/game', [GameController::class, 'index'])->name('game.index');
     Route::get('/game/{stage}', [GameController::class, 'play'])->name('game.play')->where('stage', '[1-5]');
+    Route::post('/game/{stage}/save', [GameController::class, 'saveProgress'])->name('game.save');
     Route::post('/game/{stage}/submit', [GameController::class, 'submitStage'])->name('game.submit');
 
     // Pencapaian
@@ -53,6 +63,8 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->name('admi
 
     // Users
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
     Route::patch('/users/{user}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('users.toggle-admin');
     Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
 

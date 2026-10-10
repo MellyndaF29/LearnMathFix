@@ -27,6 +27,7 @@ export default function CreateQuestion({ topic }) {
         explanation: '',
         type: 'multiple_choice',
         difficulty: 'Sedang',
+        quiz_level: 1,
         order: 0,
     });
 
@@ -166,6 +167,19 @@ export default function CreateQuestion({ topic }) {
                                 <option value="Sedang">Sedang</option>
                                 <option value="Sulit">Sulit</option>
                             </select>
+                        </FormField>
+
+                        <FormField label="Level Kuis *" error={errors.quiz_level}>
+                            <input
+                                id="question-quiz-level"
+                                type="number"
+                                min={1}
+                                max={3}
+                                value={data.quiz_level}
+                                onChange={e => setData('quiz_level', parseInt(e.target.value) || 1)}
+                                className={inputClass}
+                                style={inputStyle}
+                            />
                         </FormField>
 
                         <FormField label="Urutan" error={errors.order}>

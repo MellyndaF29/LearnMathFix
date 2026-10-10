@@ -47,9 +47,9 @@ export default function Welcome({ auth }) {
                                 </Link>
                                 <p className="text-white/55 text-sm mt-2">
                                     Belum punya akun?{' '}
-                                    <Link href={route('register')}
+                                    <Link href={route('beli.akun')}
                                           className="text-bronze-light font-semibold hover:text-bronze-light/80 no-underline transition-colors">
-                                        Daftar sekarang
+                                        Dapatkan Akses
                                     </Link>
                                 </p>
                             </>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\QuizAttempt;
 use App\Models\Section;
 use App\Models\Topic;
 use App\Models\UserProgress;
@@ -55,10 +56,25 @@ class MateriController extends Controller
             ->pluck('section_id')
             ->toArray();
 
+        $passedLevels = QuizAttempt::where('user_id', $request->user()->id)
+            ->where('topic_id', $topic->id)
+            ->where('is_passed', true)
+            ->pluck('quiz_level')
+            ->toArray();
+
+        $availableLevels = $topic->questions()
+            ->where('type', 'multiple_choice')
+            ->select('quiz_level')
+            ->distinct()
+            ->pluck('quiz_level')
+            ->toArray();
+
         return Inertia::render('Materi/Show', [
             'topic' => $topic->only(['id', 'title', 'slug', 'icon', 'description', 'color', 'difficulty']),
             'sections' => $sections,
             'completedSections' => $completedSections,
+            'passedLevels' => $passedLevels,
+            'availableLevels' => $availableLevels,
         ]);
     }
 

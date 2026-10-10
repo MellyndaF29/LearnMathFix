@@ -10,6 +10,7 @@ class QuizAttempt extends Model
     protected $fillable = [
         'user_id',
         'topic_id',
+        'quiz_level',
         'score',
         'total_questions',
         'correct_answers',
@@ -20,6 +21,7 @@ class QuizAttempt extends Model
     protected $casts = [
         'answers' => 'array',
         'is_passed' => 'boolean',
+        'quiz_level' => 'integer',
     ];
 
     public function user(): BelongsTo

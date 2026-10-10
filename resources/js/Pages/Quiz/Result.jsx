@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Result({ auth, topic, score, correctAnswers, totalQuestions, isPassed, review }) {
+export default function Result({
+    auth, topic, score, correctAnswers, totalQuestions,
+    isPassed, currentLevel, nextLevel, allLevelsPassed, review
+}) {
     const starCount = score >= 90 ? 3 : score >= 70 ? 2 : score >= 40 ? 1 : 0;
     const wrongAnswers = totalQuestions - correctAnswers;
 
@@ -11,6 +14,8 @@ export default function Result({ auth, topic, score, correctAnswers, totalQuesti
         backdropFilter: 'blur(24px)',
         boxShadow: '0 16px 48px rgba(5,13,36,0.5), inset 0 1px 0 rgba(255,255,255,0.08)',
     };
+
+    const levelLabel = { 1: 'Level 1 — Dasar', 2: 'Level 2 — Menengah', 3: 'Level 3 — Mahir' };
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -28,13 +33,23 @@ export default function Result({ auth, topic, score, correctAnswers, totalQuesti
                     }} />
 
                     <div className="p-8">
+                        {/* Level badge */}
+                        <div className="text-center mb-4">
+                            <span className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full"
+                                style={{ background: 'rgba(201,164,92,0.15)', color: '#c9a45c', border: '1px solid rgba(201,164,92,0.3)' }}>
+                                Kuis {levelLabel[currentLevel] ?? `Level ${currentLevel}`}
+                            </span>
+                        </div>
+
                         {/* Status + Title */}
                         <div className="text-center mb-8">
                             <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${isPassed ? 'text-correct' : 'text-wrong'}`}>
                                 {isPassed ? '— Lulus —' : '— Belum Lulus —'}
                             </p>
                             <h1 className="font-cinzel text-2xl font-bold text-white mb-1">
-                                {isPassed ? 'Selamat, kamu berhasil!' : 'Hampir berhasil!'}
+                                {isPassed
+                                    ? (allLevelsPassed ? 'Selamat! Semua Level Selesai!' : 'Level Berhasil Dilewati!')
+                                    : 'Hampir berhasil!'}
                             </h1>
                             <p className="text-white/40 text-sm">{topic.title}</p>
                         </div>
@@ -81,6 +96,26 @@ export default function Result({ auth, topic, score, correctAnswers, totalQuesti
                             </div>
                         </div>
 
+                        {/* Level progress indicator */}
+                        <div className="flex justify-center gap-3 mb-8">
+                            {[1, 2, 3].map(lvl => (
+                                <div key={lvl} className="flex flex-col items-center gap-1">
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all ${
+                                        lvl < currentLevel
+                                            ? 'bg-correct border-correct text-white'
+                                            : lvl === currentLevel
+                                                ? isPassed
+                                                    ? 'bg-correct border-correct text-white'
+                                                    : 'bg-bronze/20 border-bronze text-bronze-light'
+                                                : 'bg-white/5 border-white/15 text-white/30'
+                                    }`}>
+                                        {lvl < currentLevel || (lvl === currentLevel && isPassed) ? '✓' : lvl}
+                                    </div>
+                                    <span className="text-[10px] text-white/30 font-semibold">Lvl {lvl}</span>
+                                </div>
+                            ))}
+                        </div>
+
                         {/* Action buttons */}
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             {!isPassed && (
@@ -89,10 +124,26 @@ export default function Result({ auth, topic, score, correctAnswers, totalQuesti
                                     Coba Lagi
                                 </Link>
                             )}
-                            <Link href={route('materi.index')}
-                                  className="text-center py-3 px-8 text-navy-deep font-bold rounded-xl transition-all hover:shadow-lg no-underline text-sm hover:-translate-y-0.5"
-                                  style={{ background: 'linear-gradient(135deg, #ecd39a, #c9a45c)' }}>
-                                {isPassed ? 'Topik Berikutnya' : 'Pelajari Lagi'}
+
+                            {isPassed && nextLevel && !allLevelsPassed && (
+                                <Link href={route('quiz.show', topic.slug)}
+                                      className="text-center py-3 px-8 text-white font-bold rounded-xl transition-all hover:shadow-lg no-underline text-sm hover:-translate-y-0.5"
+                                      style={{ background: 'linear-gradient(135deg, #1f4fbf, #0d1f4d)', border: '1px solid rgba(201,164,92,0.3)' }}>
+                                    Lanjut ke Level {nextLevel} →
+                                </Link>
+                            )}
+
+                            {(allLevelsPassed || (isPassed && !nextLevel)) && (
+                                <Link href={route('materi.index')}
+                                      className="text-center py-3 px-8 text-navy-deep font-bold rounded-xl transition-all hover:shadow-lg no-underline text-sm hover:-translate-y-0.5"
+                                      style={{ background: 'linear-gradient(135deg, #ecd39a, #c9a45c)' }}>
+                                    {allLevelsPassed ? 'Ke Daftar Materi 🎉' : 'Ke Daftar Materi'}
+                                </Link>
+                            )}
+
+                            <Link href={route('materi.show', topic.slug)}
+                                  className="text-center py-3 px-8 border border-white/15 text-white/50 font-semibold rounded-xl hover:bg-white/5 transition-colors no-underline text-sm">
+                                Kembali ke Materi
                             </Link>
                         </div>
                     </div>

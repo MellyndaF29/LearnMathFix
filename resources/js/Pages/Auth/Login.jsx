@@ -144,12 +144,12 @@ export default function Login({ status, canResetPassword }) {
                         </button>
                     </form>
 
-                    {/* Register link */}
-                    <p className="mt-7 text-center text-contrast-subtle text-sm">
+                    {/* Beli akun info link */}
+                    <p className="mt-6 text-center text-contrast-subtle text-sm">
                         Belum punya akun?{' '}
-                        <Link href={route('register')}
+                        <Link href={route('beli.akun')}
                               className="text-bronze-light/70 hover:text-bronze-light font-semibold transition-colors no-underline">
-                            Daftar sekarang
+                            Dapatkan Akses →
                         </Link>
                     </p>
                 </div>

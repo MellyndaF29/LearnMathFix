@@ -30,8 +30,16 @@ export default function AdminUsers({ users, filters }) {
                     <p className="text-white/50 text-sm">Total {users.total} pengguna terdaftar.</p>
                 </div>
 
-                {/* Search */}
-                <form onSubmit={handleSearch} className="flex gap-2">
+                {/* Search and Action */}
+                <div className="flex gap-2 items-center">
+                    <Link
+                        href={route('admin.users.create')}
+                        className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5 no-underline"
+                        style={{ background: 'linear-gradient(135deg, #1f4fbf, #0d1f4d)', color: '#fff', border: '1px solid rgba(143,180,255,0.25)' }}
+                    >
+                        + Tambah Pengguna
+                    </Link>
+                    <form onSubmit={handleSearch} className="flex gap-2">
                     <input
                         id="search-users"
                         type="text"
@@ -53,6 +61,7 @@ export default function AdminUsers({ users, filters }) {
                         Cari
                     </button>
                 </form>
+            </div>
             </div>
 
             {/* Table */}

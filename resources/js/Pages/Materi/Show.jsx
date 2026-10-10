@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function Show({ auth, topic, sections, completedSections }) {
+export default function Show({ auth, topic, sections, completedSections, passedLevels, availableLevels = [] }) {
     const [activeSectionId, setActiveSectionId] = useState(
         sections.length > 0 ? sections[0].id : null
     );
@@ -102,11 +102,32 @@ export default function Show({ auth, topic, sections, completedSections }) {
 
                     {/* Quiz CTA */}
                     <div className="p-4" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                        <Link href={route('quiz.show', topic.slug)}
-                              className="block w-full text-center py-3 text-white rounded-xl font-bold transition-all no-underline text-sm hover:opacity-90"
-                              style={{ background: 'linear-gradient(135deg, #1f4fbf, #0d1f4d)', border: '1px solid rgba(201,164,92,0.3)' }}>
-                            Mulai Kuis
-                        </Link>
+                        {overallProgress >= 100 ? (() => {
+                            if (!availableLevels || availableLevels.length === 0) {
+                                return <div className="text-center text-xs text-white/50 font-semibold p-2">Kuis belum tersedia untuk materi ini.</div>;
+                            }
+
+                            const nextLevel = passedLevels.includes(2) ? 3 : passedLevels.includes(1) ? 2 : 1;
+                            if (passedLevels.includes(3)) {
+                                return <div className="text-center text-sm font-bold text-correct p-2">Semua Kuis Selesai!</div>;
+                            }
+
+                            if (!availableLevels.includes(nextLevel)) {
+                                return <div className="text-center text-xs text-white/50 font-semibold p-2">Kuis Level {nextLevel} belum tersedia.</div>;
+                            }
+
+                            return (
+                                <Link href={route('quiz.show', topic.slug)}
+                                      className="block w-full text-center py-3 text-white rounded-xl font-bold transition-all no-underline text-sm hover:opacity-90"
+                                      style={{ background: 'linear-gradient(135deg, #1f4fbf, #0d1f4d)', border: '1px solid rgba(201,164,92,0.3)' }}>
+                                    Mulai Kuis Level {nextLevel}
+                                </Link>
+                            );
+                        })() : (
+                            <div className="text-center text-xs text-white/50 font-semibold p-2">
+                                Selesaikan semua materi untuk membuka kuis.
+                            </div>
+                        )}
                     </div>
                 </div>
 

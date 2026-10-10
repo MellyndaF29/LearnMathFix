@@ -36,6 +36,7 @@ export default function EditQuestion({ topic, question }) {
         explanation: question.explanation ?? '',
         type: question.type,
         difficulty: question.difficulty,
+        quiz_level: question.quiz_level ?? 1,
         order: question.order ?? 0,
     });
 
@@ -170,6 +171,9 @@ export default function EditQuestion({ topic, question }) {
                                 <option value="Sedang">Sedang</option>
                                 <option value="Sulit">Sulit</option>
                             </select>
+                        </FormField>
+                        <FormField label="Level Kuis *" error={errors.quiz_level}>
+                            <input id="question-quiz-level" type="number" min={1} max={3} value={data.quiz_level} onChange={e => setData('quiz_level', parseInt(e.target.value) || 1)} className={inputClass} style={inputStyle} />
                         </FormField>
                         <FormField label="Urutan" error={errors.order}>
                             <input id="question-order" type="number" min={0} value={data.order} onChange={e => setData('order', parseInt(e.target.value) || 0)} className={inputClass} style={inputStyle} />
