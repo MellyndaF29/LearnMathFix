@@ -8,62 +8,140 @@ import axios from 'axios';
    VIRTUAL JOYSTICK COMPONENT (mobile only)
 ═══════════════════════════════════════════════════════════ */
 function VirtualJoystick({ dirRef }) {
-    const baseRef  = useRef(null);
-    const thumbRef = useRef(null);
-    const touchId  = useRef(null);
-    const center   = useRef({ x: 0, y: 0 });
-    const MAX_R    = 38;
+    const baseRef         = useRef(null);
+    const thumbRef        = useRef(null);
+    const activePointerId = useRef(null);
+    const center          = useRef({ x: 0, y: 0 });
+    const MAX_R           = 36;
 
     const resetThumb = useCallback(() => {
         if (thumbRef.current) thumbRef.current.style.transform = 'translate(-50%,-50%)';
         dirRef.current = { x: 0, y: 0 };
-        touchId.current = null;
+        activePointerId.current = null;
     }, [dirRef]);
 
-    const onStart = useCallback((e) => {
+    const handlePointer = useCallback((clientX, clientY) => {
+        const dx   = clientX - center.current.x;
+        const dy   = clientY - center.current.y;
+        const dist = Math.hypot(dx, dy);
+        const cd   = Math.min(dist, MAX_R);
+        const ang  = Math.atan2(dy, dx);
+        const nx   = Math.cos(ang) * cd;
+        const ny   = Math.sin(ang) * cd;
+        if (thumbRef.current) {
+            thumbRef.current.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
+        }
+        dirRef.current = { x: nx / MAX_R, y: ny / MAX_R };
+    }, [dirRef]);
+
+    const onPointerDown = useCallback((e) => {
         e.preventDefault();
-        const t = e.changedTouches[0];
-        touchId.current = t.identifier;
+        try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+        } catch (_) {}
+        activePointerId.current = e.pointerId;
         const r = baseRef.current.getBoundingClientRect();
         center.current = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    }, []);
+        handlePointer(e.clientX, e.clientY);
+    }, [handlePointer]);
 
-    const onMove = useCallback((e) => {
+    const onPointerMove = useCallback((e) => {
+        if (activePointerId.current !== e.pointerId) return;
         e.preventDefault();
-        for (const t of e.changedTouches) {
-            if (t.identifier !== touchId.current) continue;
-            const dx   = t.clientX - center.current.x;
-            const dy   = t.clientY - center.current.y;
-            const dist = Math.hypot(dx, dy);
-            const cd   = Math.min(dist, MAX_R);
-            const ang  = Math.atan2(dy, dx);
-            const nx   = Math.cos(ang) * cd;
-            const ny   = Math.sin(ang) * cd;
-            if (thumbRef.current)
-                thumbRef.current.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
-            dirRef.current = { x: nx / MAX_R, y: ny / MAX_R };
-            break;
-        }
-    }, [dirRef]);
+        handlePointer(e.clientX, e.clientY);
+    }, [handlePointer]);
 
-    const onEnd = useCallback((e) => {
-        e.preventDefault();
-        for (const t of e.changedTouches) {
-            if (t.identifier === touchId.current) { resetThumb(); break; }
+    const onPointerUp = useCallback((e) => {
+        if (activePointerId.current === e.pointerId) {
+            resetThumb();
         }
     }, [resetThumb]);
 
     return (
         <div
             ref={baseRef}
-            className="joystick-base"
-            onTouchStart={onStart}
-            onTouchMove={onMove}
-            onTouchEnd={onEnd}
-            onTouchCancel={onEnd}
+            className="joystick-base select-none"
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
             style={{ touchAction: 'none' }}
         >
+            <span className="absolute top-1 left-1/2 -translate-x-1/2 text-[9px] text-white/20 font-bold pointer-events-none select-none">▲</span>
+            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] text-white/20 font-bold pointer-events-none select-none">▼</span>
+            <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[9px] text-white/20 font-bold pointer-events-none select-none">◄</span>
+            <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[9px] text-white/20 font-bold pointer-events-none select-none">►</span>
             <div ref={thumbRef} className="joystick-thumb"/>
+        </div>
+    );
+}
+
+function DPad({ dirRef }) {
+    const activeDir = useRef({ up: false, down: false, left: false, right: false });
+
+    const updateDir = useCallback(() => {
+        let x = 0;
+        let y = 0;
+        if (activeDir.current.left)  x -= 1;
+        if (activeDir.current.right) x += 1;
+        if (activeDir.current.up)    y -= 1;
+        if (activeDir.current.down)  y += 1;
+        if (x !== 0 && y !== 0) {
+            x *= 0.707;
+            y *= 0.707;
+        }
+        dirRef.current = { x, y };
+    }, [dirRef]);
+
+    const press = (key) => {
+        activeDir.current[key] = true;
+        updateDir();
+    };
+
+    const release = (key) => {
+        activeDir.current[key] = false;
+        updateDir();
+    };
+
+    const btnProps = (key) => ({
+        onPointerDown:   (e) => { e.preventDefault(); press(key); },
+        onPointerUp:     (e) => { e.preventDefault(); release(key); },
+        onPointerCancel: (e) => { e.preventDefault(); release(key); },
+        onPointerLeave:  () => { release(key); },
+        style: { touchAction: 'none' },
+    });
+
+    return (
+        <div className="relative w-[96px] h-[96px] select-none" style={{ touchAction: 'none' }}>
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-slate-800/90 border border-white/10 pointer-events-none" />
+            <button
+                type="button"
+                {...btnProps('up')}
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-t-lg bg-slate-800/90 active:bg-amber-500 text-white active:text-black border border-white/20 flex items-center justify-center text-[11px] font-bold shadow-md transition-colors"
+            >
+                ▲
+            </button>
+            <button
+                type="button"
+                {...btnProps('down')}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-8 rounded-b-lg bg-slate-800/90 active:bg-amber-500 text-white active:text-black border border-white/20 flex items-center justify-center text-[11px] font-bold shadow-md transition-colors"
+            >
+                ▼
+            </button>
+            <button
+                type="button"
+                {...btnProps('left')}
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-l-lg bg-slate-800/90 active:bg-amber-500 text-white active:text-black border border-white/20 flex items-center justify-center text-[11px] font-bold shadow-md transition-colors"
+            >
+                ◄
+            </button>
+            <button
+                type="button"
+                {...btnProps('right')}
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-r-lg bg-slate-800/90 active:bg-amber-500 text-white active:text-black border border-white/20 flex items-center justify-center text-[11px] font-bold shadow-md transition-colors"
+            >
+                ►
+            </button>
         </div>
     );
 }
@@ -202,6 +280,7 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
     const [isSubmitting,  setIsSubmitting]  = useState(false);
     const [hitFlash,      setHitFlash]      = useState(false);
     const [sparkle,       setSparkle]       = useState(null);
+    const [controlMode,   setControlMode]   = useState('joystick'); // 'joystick' | 'dpad'
 
     /* ── Physics / game loop refs ── */
     const rawX = Number(playerPosition?.x);
@@ -523,7 +602,7 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
                 {/* ─── GAME MAP ─── */}
                 <div
                     className={`relative w-full rounded-[24px] sm:rounded-[32px] border overflow-hidden select-none transition-all duration-300 ${hitFlash ? 'border-red-500 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : 'border-white/10 shadow-2xl'}`}
-                    style={{ paddingBottom: 'clamp(75%, calc(100vw - 2rem), 64%)' }}
+                    style={{ paddingBottom: 'clamp(62%, 75vw, 60%)' }}
                 >
                     <div className="absolute inset-0">
 
@@ -636,7 +715,8 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
                                     <CrystalSVG active={isActive} collected={isCompleted} index={idx}/>
                                     {isNearby && !isCompleted && (
                                         <div className="absolute left-1/2 -translate-x-1/2 -bottom-9 bg-amber-500 text-black text-[11px] font-black px-2.5 py-1 rounded-full whitespace-nowrap shadow-lg" style={{ animation:'bounce 0.8s ease-in-out infinite' }}>
-                                            E / Spasi
+                                            <span className="hidden sm:inline">E / Spasi</span>
+                                            <span className="sm:hidden">Ambil 💎</span>
                                         </div>
                                     )}
                                 </div>
@@ -711,33 +791,6 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
                             </div>
                         )}
 
-                        {/* ── MOBILE VIRTUAL CONTROLS ── */}
-                        {gamePhase === 'playing' && (
-                            <div className="md:hidden absolute bottom-0 left-0 right-0 flex items-end justify-between px-4 pb-4 z-25 pointer-events-none" style={{ zIndex: 25 }}>
-                                {/* Joystick (left) */}
-                                <div className="pointer-events-auto">
-                                    <VirtualJoystick dirRef={touchDirRef}/>
-                                </div>
-                                {/* Action button (right) */}
-                                <div className="pointer-events-auto flex flex-col items-center gap-2">
-                                    <div className="text-[10px] text-white/40 font-bold uppercase tracking-wide">Ambil</div>
-                                    <button
-                                        onTouchStart={(e) => { e.preventDefault(); touchActionRef.current = true; }}
-                                        onTouchEnd={(e) => { e.preventDefault(); }}
-                                        className="w-16 h-16 rounded-full flex items-center justify-center font-black text-xl text-amber-300 active:scale-90 transition-transform"
-                                        style={{
-                                            background: nearCrystal !== null ? 'rgba(251,191,36,0.3)' : 'rgba(255,255,255,0.08)',
-                                            border: nearCrystal !== null ? '2px solid rgba(251,191,36,0.7)' : '2px solid rgba(255,255,255,0.2)',
-                                            boxShadow: nearCrystal !== null ? '0 0 20px rgba(251,191,36,0.4)' : 'none',
-                                            touchAction: 'none',
-                                        }}
-                                    >
-                                        💎
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
                         {/* ── GAME OVER ── */}
                         {gamePhase === 'gameover' && (
                             <div className="absolute inset-0 bg-black/82 backdrop-blur-sm flex items-center justify-center z-30 rounded-[32px]">
@@ -766,6 +819,54 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
                         )}
                     </div>
                 </div>
+
+                {/* ── MOBILE VIRTUAL CONTROLS (di bawah layar game, mobile only) ── */}
+                {gamePhase === 'playing' && (
+                    <div className="md:hidden mt-3 sm:mt-5 flex items-center justify-between px-2 sm:px-4 select-none">
+                        {/* Joystick (left) */}
+                        <div className="flex flex-col items-center gap-1.5">
+                            <VirtualJoystick dirRef={touchDirRef}/>
+                            <span className="text-[10px] text-bronze-light/70 font-bold uppercase tracking-wider">Gerak</span>
+                        </div>
+
+                        {/* Center guide/status indicator */}
+                        <div className="flex flex-col items-center text-center px-2 py-1 max-w-[150px]">
+                            {nearCrystal !== null ? (
+                                <div className="animate-bounce bg-amber-500/20 border border-amber-500/60 rounded-full px-3.5 py-1.5 text-amber-300 text-xs font-black shadow-[0_0_15px_rgba(251,191,36,0.5)] flex items-center gap-1.5 whitespace-nowrap">
+                                    <span>✨</span> Tekan Ambil!
+                                </div>
+                            ) : (
+                                <div className="bg-white/5 border border-white/10 rounded-2xl px-3 py-2 text-[11px] text-white/50 font-medium leading-tight text-center backdrop-blur-sm">
+                                    {completedCPs.length >= questions.length
+                                        ? '🎉 Kristal terkumpul!'
+                                        : `Dekati Kristal ${nextCrystalToCollect + 1}`}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Action button (right) */}
+                        <div className="flex flex-col items-center gap-1.5">
+                            <button
+                                onTouchStart={(e) => { e.preventDefault(); touchActionRef.current = true; }}
+                                onTouchEnd={(e) => { e.preventDefault(); }}
+                                onPointerDown={(e) => { e.preventDefault(); touchActionRef.current = true; }}
+                                className={`w-20 h-20 rounded-full flex flex-col items-center justify-center font-black transition-all active:scale-90 select-none shadow-xl ${
+                                    nearCrystal !== null
+                                        ? 'bg-gradient-to-br from-amber-300 via-amber-400 to-amber-600 text-slate-950 border-2 border-amber-200 shadow-[0_0_30px_rgba(251,191,36,0.8)] scale-105 animate-pulse'
+                                        : 'bg-slate-900/90 text-amber-300/80 border-2 border-bronze/40 hover:border-bronze shadow-[0_4px_16px_rgba(0,0,0,0.6)]'
+                                }`}
+                                style={{ touchAction: 'none' }}
+                                aria-label="Ambil Kristal"
+                            >
+                                <span className="text-2xl leading-none">💎</span>
+                                <span className={`text-[10px] font-black uppercase tracking-wider mt-0.5 ${nearCrystal !== null ? 'text-slate-950 font-extrabold' : 'text-amber-300/80'}`}>
+                                    Ambil
+                                </span>
+                            </button>
+                            <span className="text-[10px] text-bronze-light/70 font-bold uppercase tracking-wider">Aksi</span>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* ═══ QUESTION MODAL ═══ */}

@@ -260,24 +260,26 @@ button, a, label, [role="button"] {
 
 /* Virtual joystick */
 .joystick-base {
-    width: 100px;
-    height: 100px;
+    width: 96px;
+    height: 96px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-    border: 2px solid rgba(255,255,255,0.2);
+    background: radial-gradient(circle, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+    border: 2px solid rgba(201, 164, 92, 0.4);
     position: relative;
     touch-action: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(201, 164, 92, 0.15);
 }
 .joystick-thumb {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.35);
-    border: 2px solid rgba(255,255,255,0.6);
+    background: radial-gradient(circle at 35% 35%, #ecd39a 0%, #c9a45c 50%, #785820 100%);
+    border: 2px solid rgba(255, 255, 255, 0.85);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     transition: box-shadow 0.1s;
-    box-shadow: 0 0 16px rgba(201,164,92,0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 16px rgba(201, 164, 92, 0.5);
+    pointer-events: none;
 }
