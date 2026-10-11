@@ -237,7 +237,16 @@ function QuizCTA({ overallProgress, availableLevels, passedLevels, topicSlug }) 
     }
     const nextLevel = passedLevels.includes(2) ? 3 : passedLevels.includes(1) ? 2 : 1;
     if (passedLevels.includes(3)) {
-        return <div className="text-center text-sm font-bold text-correct p-2">Semua Kuis Selesai! 🎉</div>;
+        return (
+            <div className="space-y-2 text-center p-2">
+                <div className="text-sm font-bold text-correct">Semua Kuis Selesai! 🎉</div>
+                <Link href={route('game.index')}
+                      className="block w-full text-center py-2.5 rounded-xl font-bold text-xs transition-all no-underline text-navy-deep hover:opacity-90 shadow-md"
+                      style={{ background: 'linear-gradient(135deg,#ecd39a,#c9a45c)' }}>
+                    🗺️ Jelajahi Peta Game
+                </Link>
+            </div>
+        );
     }
     if (!availableLevels.includes(nextLevel)) {
         return <div className="text-center text-xs text-white/50 font-semibold p-2">Kuis Level {nextLevel} belum tersedia.</div>;

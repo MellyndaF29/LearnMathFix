@@ -2,10 +2,16 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function Show({ auth, topic, questions }) {
+export default function Show({ auth, topic, questions, currentLevel = 1 }) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const question = questions[currentIndex];
     const isLast = currentIndex === questions.length - 1;
+
+    const levelLabels = {
+        1: 'Level 1 — Dasar',
+        2: 'Level 2 — Menengah',
+        3: 'Level 3 — Mahir',
+    };
 
     const { data, setData, post, processing } = useForm({ answers: {} });
 
@@ -23,7 +29,7 @@ export default function Show({ auth, topic, questions }) {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title={`Kuis: ${topic.title}`} />
+            <Head title={`Kuis Level ${currentLevel}: ${topic.title}`} />
 
             <div className="max-w-3xl mx-auto">
                 {/* Back link */}
@@ -45,7 +51,12 @@ export default function Show({ auth, topic, questions }) {
                     <div className="px-7 py-5 flex justify-between items-center"
                          style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)' }}>
                         <div>
-                            <p className="text-xs text-bronze-light font-bold uppercase tracking-widest mb-0.5">Kuis</p>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs text-bronze-light font-bold uppercase tracking-widest">Kuis</span>
+                                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-bronze/40 bg-bronze/15 text-bronze-light">
+                                    {levelLabels[currentLevel] || `Level ${currentLevel}`}
+                                </span>
+                            </div>
                             <h2 className="font-cinzel text-lg font-bold text-white">{topic.title}</h2>
                         </div>
                         <div className="bg-black/40 border border-white/10 rounded-full px-4 py-1.5 text-sm font-bold text-bronze-light">

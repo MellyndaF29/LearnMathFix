@@ -68,6 +68,9 @@ function VirtualJoystick({ dirRef }) {
     );
 }
 
+import { MAPS } from './mapData';
+import { RenderObstacle, RenderEnemy } from './MapElements';
+
 /* ═══════════════════════════════════════════════════════════
    CONSTANTS
 ═══════════════════════════════════════════════════════════ */
@@ -76,45 +79,6 @@ const CHAR_R      = 2.8;    // % collision radius
 const PROXIMITY   = 5.8;    // % to activate crystal
 const ENEMY_SPEED = 0.14;
 const ENEMY_HIT_R = 5.5;    // % enemy hit radius
-
-/* Crystal positions (% of map container) */
-const CRYSTAL_SPOTS = [
-    { x: 18, y: 73 }, { x: 36, y: 57 }, { x: 22, y: 38 },
-    { x: 46, y: 22 }, { x: 64, y: 32 }, { x: 80, y: 18 },
-    { x: 88, y: 48 }, { x: 72, y: 68 }, { x: 55, y: 78 },
-];
-
-/* Enemy patrol waypoints */
-const ENEMY_INIT = [
-    { waypoints: [{ x: 32, y: 43 }, { x: 56, y: 43 }, { x: 56, y: 60 }, { x: 32, y: 60 }], wpIdx: 0, x: 32, y: 43 },
-    { waypoints: [{ x: 65, y: 20 }, { x: 83, y: 36 }, { x: 83, y: 20 }], wpIdx: 0, x: 65, y: 20 },
-];
-
-/* Tree positions */
-const TREES = [
-    { x: 4,  y: 10, s: 1.3 }, { x: 14, y: 7,  s: 1.0 }, { x: 30, y: 4,  s: 1.2 },
-    { x: 50, y: 7,  s: 0.9 }, { x: 72, y: 4,  s: 1.1 }, { x: 92, y: 8,  s: 1.3 },
-    { x: 97, y: 28, s: 0.9 }, { x: 96, y: 60, s: 1.2 }, { x: 90, y: 82, s: 1.0 },
-    { x: 68, y: 90, s: 1.3 }, { x: 42, y: 92, s: 0.9 }, { x: 18, y: 90, s: 1.1 },
-    { x: 3,  y: 75, s: 1.2 }, { x: 2,  y: 45, s: 0.9 }, { x: 12, y: 22, s: 0.8 },
-    { x: 40, y: 70, s: 0.9 }, { x: 58, y: 50, s: 0.8 }, { x: 75, y: 38, s: 0.9 },
-    { x: 8,  y: 85, s: 0.8 }, { x: 95, y: 75, s: 1.0 },
-];
-
-/* Mushrooms */
-const MUSHROOMS = [
-    { x: 25, y: 82 }, { x: 48, y: 45 }, { x: 70, y: 78 },
-    { x: 85, y: 70 }, { x: 10, y: 40 }, { x: 60, y: 13 },
-    { x: 32, y: 92 }, { x: 88, y: 30 },
-];
-
-/* Rocks */
-const ROCKS = [
-    { x: 52, y: 60 }, { x: 28, y: 48 }, { x: 78, y: 55 }, { x: 43, y: 82 },
-];
-
-/* SVG winding path */
-const PATH_D = 'M 16 78 C 20 65,28 60,34 57 C 40 54,36 42,22 38 C 14 35,42 18,46 22 C 50 26,60 30,64 32 C 70 35,78 20,80 18 C 82 16,90 42,88 48 C 86 54,76 64,72 68 C 68 72,60 76,55 78';
 
 /* ═══════════════════════════════════════════════════════════
    SVG COMPONENTS
@@ -177,24 +141,6 @@ function WizardSVG({ frame, facingLeft }) {
     );
 }
 
-function GhostSVG() {
-    return (
-        <svg width="46" height="54" viewBox="0 0 46 54" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="23" cy="52" rx="12" ry="3.5" fill="black" opacity="0.18"/>
-            <path d="M 4 28 Q 4 4 23 4 Q 42 4 42 28 L 42 46 Q 34 38 23 46 Q 12 38 4 46 Z" fill="rgba(240,230,255,0.9)"/>
-            <path d="M 4 28 Q 4 4 23 4 Q 42 4 42 28 L 42 46 Q 34 38 23 46 Q 12 38 4 46 Z" fill="#7c3aed" opacity="0.25"/>
-            {/* Eyes */}
-            <ellipse cx="16" cy="25" rx="5.5" ry="6.5" fill="#dc2626"/>
-            <ellipse cx="30" cy="25" rx="5.5" ry="6.5" fill="#dc2626"/>
-            <ellipse cx="16" cy="26" rx="2.5" ry="3.5" fill="#1c1917"/>
-            <ellipse cx="30" cy="26" rx="2.5" ry="3.5" fill="#1c1917"/>
-            <ellipse cx="15" cy="24" rx="1.2" ry="1.5" fill="white" opacity="0.7"/>
-            <ellipse cx="29" cy="24" rx="1.2" ry="1.5" fill="white" opacity="0.7"/>
-            {/* Glow */}
-            <ellipse cx="23" cy="28" rx="19" ry="24" fill="#7c3aed" opacity="0.1"/>
-        </svg>
-    );
-}
 
 function CrystalSVG({ active, collected, index }) {
     const gId = `cg-${index}`;
@@ -231,45 +177,14 @@ function CrystalSVG({ active, collected, index }) {
     );
 }
 
-function TreeSVG({ s = 1 }) {
-    return (
-        <svg width={50 * s} height={66 * s} viewBox="0 0 50 66" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', overflow: 'visible' }}>
-            <ellipse cx="25" cy="64" rx="11" ry="3.5" fill="black" opacity="0.18"/>
-            <rect x="21" y="46" width="8" height="20" rx="3" fill="#4b2d10"/>
-            <polygon points="25,4 3,46 47,46" fill="#15803d"/>
-            <polygon points="25,14 5,46 45,46" fill="#16a34a" opacity="0.55"/>
-            <polygon points="25,26 8,46 42,46" fill="#22c55e" opacity="0.3"/>
-            <polygon points="25,4 22,46 28,46" fill="#4ade80" opacity="0.18"/>
-        </svg>
-    );
-}
-
-function MushroomSVG() {
-    return (
-        <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-            <rect x="12" y="17" width="6" height="13" rx="2" fill="#fde68a"/>
-            <ellipse cx="15" cy="17" rx="13" ry="10" fill="#dc2626"/>
-            <ellipse cx="8"  cy="14" rx="3.5" ry="2.5" fill="white" opacity="0.75"/>
-            <ellipse cx="20" cy="11" rx="2.5" ry="2"   fill="white" opacity="0.75"/>
-            <ellipse cx="15" cy="8"  rx="2"   ry="1.5" fill="white" opacity="0.5"/>
-        </svg>
-    );
-}
-
-function RockSVG() {
-    return (
-        <svg width="36" height="26" viewBox="0 0 36 26" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="18" cy="24" rx="16" ry="4" fill="black" opacity="0.15"/>
-            <path d="M 4 22 Q 2 12 10 6 Q 18 0 26 4 Q 34 8 34 16 Q 32 22 24 24 L 8 24 Z" fill="#6b7280"/>
-            <path d="M 10 6 Q 18 0 26 4 Q 34 8 30 14 Q 24 8 16 6 Q 12 5 10 6Z" fill="#9ca3af"/>
-        </svg>
-    );
-}
 
 /* ═══════════════════════════════════════════════════════════
    MAIN COMPONENT
 ═══════════════════════════════════════════════════════════ */
-export default function Play({ auth, stage, stageLabel, questions, completedCheckpoints: initCompleted }) {
+export default function Play({ auth, stage, stageLabel, questions, playerPosition, completedCheckpoints: initCompleted }) {
+    /* ── Current Map Configuration ── */
+    const currentMap = useMemo(() => MAPS[stage] || MAPS[1], [stage]);
+
     /* ── React state (for UI re-renders) ── */
     const [animFrame,     setAnimFrame]     = useState(0);
     const [facingLeft,    setFacingLeft]    = useState(false);
@@ -289,8 +204,10 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
     const [sparkle,       setSparkle]       = useState(null);
 
     /* ── Physics / game loop refs ── */
-    const charXRef        = useRef(14);
-    const charYRef        = useRef(80);
+    const initialX = playerPosition?.x && playerPosition?.x !== 50 ? playerPosition.x : currentMap.startPos.x;
+    const initialY = playerPosition?.y && playerPosition?.y !== 50 ? playerPosition.y : currentMap.startPos.y;
+    const charXRef        = useRef(initialX);
+    const charYRef        = useRef(initialY);
     const facingLeftRef   = useRef(false);
     const gamePhaseRef    = useRef('playing');
     const keysRef         = useRef({});
@@ -304,7 +221,7 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
     const invincRef       = useRef(false);
     const timerRef        = useRef(null);
     const nearCrystalRef  = useRef(null);
-    const enemyDataRef    = useRef(ENEMY_INIT.map(e => ({ ...e, waypoints: e.waypoints.map(w => ({ ...w })) })));
+    const enemyDataRef    = useRef(currentMap.enemies.map(e => ({ ...e, waypoints: e.waypoints.map(w => ({ ...w })) })));
 
     /* ── DOM refs (direct style, no re-render) ── */
     const charDivRef      = useRef(null);
@@ -312,8 +229,8 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
     const enemy1Ref       = useRef(null);
     const enemyDivRefs    = [enemy0Ref, enemy1Ref];
 
-    /* ── Computed once ── */
-    const crystals = useMemo(() => CRYSTAL_SPOTS.slice(0, questions.length), []);
+    /* ── Computed crystals based on stage ── */
+    const crystals = useMemo(() => currentMap.crystals.slice(0, questions.length), [currentMap, questions.length]);
 
     /* ── Sync refs to state ── */
     useEffect(() => { completedCPsRef.current = completedCPs; }, [completedCPs]);
@@ -578,58 +495,93 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                     <div className="absolute inset-0">
 
                         {/* Background */}
-                        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 40%,#1a4731 0%,#0d2a16 55%,#051209 100%)' }}/>
+                        <div className="absolute inset-0" style={currentMap.bgStyle}/>
 
                         {/* Grid texture */}
-                        <div className="absolute inset-0 opacity-[0.04]" style={{
+                        <div className={`absolute inset-0 ${currentMap.gridOpacity}`} style={{
                             backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)',
                             backgroundSize: '40px 40px',
                         }}/>
 
                         {/* Ambient glows */}
-                        <div className="absolute pointer-events-none" style={{ left:'32%',top:'36%',width:'28%',height:'28%',background:'radial-gradient(circle,rgba(74,222,128,0.07) 0%,transparent 70%)' }}/>
-                        <div className="absolute pointer-events-none" style={{ left:'66%',top:'18%',width:'22%',height:'22%',background:'radial-gradient(circle,rgba(167,139,250,0.09) 0%,transparent 70%)' }}/>
-                        <div className="absolute pointer-events-none" style={{ left:'8%', top:'60%',width:'20%',height:'20%',background:'radial-gradient(circle,rgba(96,165,250,0.06) 0%,transparent 70%)' }}/>
+                        {currentMap.ambientGlows.map((glow, i) => (
+                            <div key={i} className="absolute pointer-events-none" style={{
+                                left: glow.left, top: glow.top, width: glow.width, height: glow.height,
+                                background: `radial-gradient(circle, ${glow.color} 0%, transparent 70%)`,
+                            }}/>
+                        ))}
 
                         {/* ── WINDING PATH SVG ── */}
                         <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
                             {/* Outer road shadow */}
-                            <path d={PATH_D} fill="none" stroke="rgba(0,0,0,0.55)" strokeWidth="7.5" vectorEffect="non-scaling-stroke"/>
+                            <path d={currentMap.pathD} fill="none" stroke={currentMap.pathColors.shadow} strokeWidth="8" vectorEffect="non-scaling-stroke"/>
                             {/* Road base */}
-                            <path d={PATH_D} fill="none" stroke="#c8a96e" strokeWidth="5.5" vectorEffect="non-scaling-stroke" opacity="0.65"/>
+                            <path d={currentMap.pathD} fill="none" stroke={currentMap.pathColors.base} strokeWidth="5.5" vectorEffect="non-scaling-stroke" opacity="0.75"/>
                             {/* Road center line */}
-                            <path d={PATH_D} fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1.5" strokeDasharray="5,7" vectorEffect="non-scaling-stroke"/>
+                            <path d={currentMap.pathD} fill="none" stroke={currentMap.pathColors.dash} strokeWidth="1.5" strokeDasharray="5,7" vectorEffect="non-scaling-stroke"/>
                         </svg>
 
-                        {/* ── TREES ── */}
-                        {TREES.map((t, i) => (
-                            <div key={i} className="absolute pointer-events-none" style={{ left:`${t.x}%`,top:`${t.y}%`,transform:'translate(-50%,-100%)',zIndex:3 }}>
-                                <TreeSVG s={t.s}/>
+                        {/* ── OBSTACLES (Dynamic per Map) ── */}
+                        {currentMap.obstacles.map((obs, i) => (
+                            <div key={i} className="absolute pointer-events-none" style={{
+                                left: `${obs.x}%`,
+                                top: `${obs.y}%`,
+                                transform: obs.type === 'sandstone_wall' ? 'translate(-50%,-50%)' : 'translate(-50%,-90%)',
+                                zIndex: obs.type === 'sandstone_wall' ? 1 : 3,
+                            }}>
+                                <RenderObstacle obstacle={obs} />
                             </div>
                         ))}
 
-                        {/* ── MUSHROOMS ── */}
-                        {MUSHROOMS.map((m, i) => (
-                            <div key={i} className="absolute pointer-events-none" style={{ left:`${m.x}%`,top:`${m.y}%`,transform:'translate(-50%,-100%)',zIndex:2 }}>
-                                <MushroomSVG/>
-                            </div>
-                        ))}
-
-                        {/* ── ROCKS ── */}
-                        {ROCKS.map((r, i) => (
-                            <div key={i} className="absolute pointer-events-none" style={{ left:`${r.x}%`,top:`${r.y}%`,transform:'translate(-50%,-70%)',zIndex:2 }}>
-                                <RockSVG/>
-                            </div>
-                        ))}
-
-                        {/* ── FIREFLIES ── */}
-                        {[...Array(14)].map((_,i) => (
+                        {/* ── THEME PARTICLES ── */}
+                        {currentMap.particleType === 'firefly' && [...Array(14)].map((_, i) => (
                             <div key={i} className="absolute rounded-full pointer-events-none"
                                 style={{
-                                    left:`${(i*73+15)%93}%`, top:`${(i*47+20)%83}%`,
-                                    width:3, height:3, background:'#fef08a', opacity:0.55,
-                                    filter:'blur(1.5px)',
-                                    animation:`firefly-${i%3} ${1.4+(i%3)*0.5}s ease-in-out ${i*0.25}s infinite`,
+                                    left: `${(i * 73 + 15) % 93}%`, top: `${(i * 47 + 20) % 83}%`,
+                                    width: 3, height: 3, background: currentMap.particleColor, opacity: 0.6,
+                                    filter: 'blur(1.5px)',
+                                    animation: `firefly-${i % 3} ${1.4 + (i % 3) * 0.5}s ease-in-out ${i * 0.25}s infinite`,
+                                }}
+                            />
+                        ))}
+                        {currentMap.particleType === 'torch_spark' && [...Array(14)].map((_, i) => (
+                            <div key={i} className="absolute rounded-full pointer-events-none"
+                                style={{
+                                    left: `${(i * 61 + 12) % 92}%`, top: `${(i * 37 + 15) % 85}%`,
+                                    width: 3, height: 3, background: i % 2 === 0 ? '#f59e0b' : '#ef4444',
+                                    opacity: 0.7, filter: 'blur(1px)',
+                                    animation: `emberRise ${2 + (i % 3) * 0.6}s ease-in-out ${i * 0.3}s infinite`,
+                                }}
+                            />
+                        ))}
+                        {currentMap.particleType === 'stardust' && [...Array(16)].map((_, i) => (
+                            <div key={i} className="absolute rounded-full pointer-events-none"
+                                style={{
+                                    left: `${(i * 57 + 10) % 94}%`, top: `${(i * 43 + 12) % 86}%`,
+                                    width: i % 2 === 0 ? 3.5 : 2, height: i % 2 === 0 ? 3.5 : 2,
+                                    background: i % 3 === 0 ? '#38bdf8' : i % 3 === 1 ? '#ec4899' : '#fef08a',
+                                    opacity: 0.75, filter: 'blur(1px)',
+                                    animation: `stardustTwinkle ${1.5 + (i % 3) * 0.4}s ease-in-out ${i * 0.2}s infinite`,
+                                }}
+                            />
+                        ))}
+                        {currentMap.particleType === 'sand_drift' && [...Array(14)].map((_, i) => (
+                            <div key={i} className="absolute rounded-full pointer-events-none"
+                                style={{
+                                    left: `${(i * 67 + 8) % 92}%`, top: `${(i * 53 + 18) % 82}%`,
+                                    width: 3, height: 2, background: '#fef08a', opacity: 0.55,
+                                    filter: 'blur(1px)',
+                                    animation: `sandDrift ${3 + (i % 3) * 0.7}s ease-in-out ${i * 0.25}s infinite`,
+                                }}
+                            />
+                        ))}
+                        {currentMap.particleType === 'magma_ember' && [...Array(16)].map((_, i) => (
+                            <div key={i} className="absolute rounded-full pointer-events-none"
+                                style={{
+                                    left: `${(i * 71 + 10) % 90}%`, top: `${(i * 49 + 25) % 80}%`,
+                                    width: 3.5, height: 3.5, background: i % 2 === 0 ? '#ef4444' : '#f97316',
+                                    opacity: 0.8, filter: 'blur(1px)',
+                                    animation: `emberRise ${1.8 + (i % 3) * 0.5}s ease-in-out ${i * 0.2}s infinite`,
                                 }}
                             />
                         ))}
@@ -668,13 +620,13 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                             </div>
                         )}
 
-                        {/* ── ENEMIES (Ghosts) ── */}
-                        {ENEMY_INIT.map((e, i) => (
+                        {/* ── ENEMIES (Dynamic per Map) ── */}
+                        {currentMap.enemies.map((e, i) => (
                             <div key={i} ref={enemyDivRefs[i]} className="absolute pointer-events-none"
                                 style={{ left:`${e.x}%`, top:`${e.y}%`, transform:'translate(-50%,-100%)', zIndex:15, filter:'drop-shadow(0 0 10px rgba(124,58,237,0.7))', animation:`ghostFloat ${2+i*0.4}s ease-in-out ${i*0.7}s infinite` }}>
-                                <GhostSVG/>
+                                <RenderEnemy type={e.type} />
                                 {/* Warning radius ring */}
-                                <div className="absolute rounded-full border border-purple-500/15 pointer-events-none"
+                                <div className="absolute rounded-full border border-purple-500/20 pointer-events-none"
                                     style={{ width:'90px',height:'90px',left:'50%',top:'50%',transform:'translate(-50%,-50%)' }}/>
                             </div>
                         ))}
@@ -895,6 +847,20 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                 @keyframes firefly-0 { 0%,100%{opacity:0.6;transform:scale(1)}   50%{opacity:0.9;transform:scale(1.5)} }
                 @keyframes firefly-1 { 0%,100%{opacity:0.4;transform:scale(0.8)} 50%{opacity:0.8;transform:scale(1.3)} }
                 @keyframes firefly-2 { 0%,100%{opacity:0.7;transform:scale(1.2)} 50%{opacity:0.4;transform:scale(0.9)} }
+                @keyframes emberRise {
+                    0%   { transform: translateY(0px) scale(0.8); opacity: 0.2; }
+                    50%  { opacity: 0.9; transform: translateY(-15px) translateX(4px) scale(1.2); }
+                    100% { transform: translateY(-30px) translateX(-4px) scale(0.6); opacity: 0; }
+                }
+                @keyframes stardustTwinkle {
+                    0%,100% { transform: scale(0.7); opacity: 0.3; }
+                    50%     { transform: scale(1.4); opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
+                }
+                @keyframes sandDrift {
+                    0%   { transform: translateX(-10px) translateY(0px); opacity: 0.2; }
+                    50%  { opacity: 0.7; transform: translateX(10px) translateY(4px); }
+                    100% { transform: translateX(30px) translateY(-2px); opacity: 0; }
+                }
                 @keyframes bounce {
                     0%,100% { transform: translateY(0); }
                     50%     { transform: translateY(-8px); }

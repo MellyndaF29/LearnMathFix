@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             TopicSeeder::class,
+            QuizLevel2And3Seeder::class,
             GameSeeder::class,
             AchievementSeeder::class,
         ]);

@@ -116,6 +116,17 @@ export default function Result({
                             ))}
                         </div>
 
+                        {/* Level 3 Completion Banner */}
+                        {isPassed && (allLevelsPassed || currentLevel === 3) && (
+                            <div className="mb-8 p-4 rounded-2xl border border-bronze/40 bg-bronze/10 text-center flex items-center justify-center gap-3">
+                                <span className="text-2xl">🗺️</span>
+                                <div className="text-left">
+                                    <p className="text-bronze-light font-bold text-sm">Peta Game Penjelajahan Terbuka!</p>
+                                    <p className="text-white/60 text-xs">Kamu telah menyelesaikan Kuis Level 3. Sekarang kamu bisa menjelajahi peta petualangan!</p>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Action buttons */}
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             {!isPassed && (
@@ -133,10 +144,17 @@ export default function Result({
                                 </Link>
                             )}
 
+                            {(allLevelsPassed || (isPassed && currentLevel === 3)) && (
+                                <Link href={route('game.index')}
+                                      className="text-center py-3 px-8 text-navy-deep font-bold rounded-xl transition-all hover:shadow-lg no-underline text-sm hover:-translate-y-0.5"
+                                      style={{ background: 'linear-gradient(135deg, #ecd39a, #c9a45c)', boxShadow: '0 0 20px rgba(201,164,92,0.3)' }}>
+                                    🗺️ Jelajahi Peta Game
+                                </Link>
+                            )}
+
                             {(allLevelsPassed || (isPassed && !nextLevel)) && (
                                 <Link href={route('materi.index')}
-                                      className="text-center py-3 px-8 text-navy-deep font-bold rounded-xl transition-all hover:shadow-lg no-underline text-sm hover:-translate-y-0.5"
-                                      style={{ background: 'linear-gradient(135deg, #ecd39a, #c9a45c)' }}>
+                                      className="text-center py-3 px-8 border border-white/20 text-white/80 font-semibold rounded-xl hover:bg-white/10 transition-colors no-underline text-sm">
                                     {allLevelsPassed ? 'Ke Daftar Materi 🎉' : 'Ke Daftar Materi'}
                                 </Link>
                             )}

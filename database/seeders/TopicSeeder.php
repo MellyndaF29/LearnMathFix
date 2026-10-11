@@ -219,6 +219,7 @@ class TopicSeeder extends Seeder
                         'explanation' => $question[3],
                         'difficulty' => $topicData['difficulty'],
                         'order' => $qOrder++,
+                        'quiz_level' => $levelIndex + 1,
                     ]);
                 }
             }

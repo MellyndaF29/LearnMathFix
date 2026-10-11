@@ -17,6 +17,7 @@ class Question extends Model
         'type',
         'difficulty',
         'order',
+        'quiz_level',
     ];
 
     protected $casts = [

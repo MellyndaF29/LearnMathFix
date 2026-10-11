@@ -126,7 +126,14 @@ class QuizLevel2And3Seeder extends Seeder
         foreach ($questions as $q) {
             $q['topic_id'] = $topicId;
             $q['type'] = 'multiple_choice';
-            Question::create($q);
+            Question::firstOrCreate(
+                [
+                    'topic_id' => $topicId,
+                    'quiz_level' => $q['quiz_level'],
+                    'question_text' => $q['question_text'],
+                ],
+                $q
+            );
         }
     }
 
@@ -221,7 +228,14 @@ class QuizLevel2And3Seeder extends Seeder
         foreach ($questions as $q) {
             $q['topic_id'] = $topicId;
             $q['type'] = 'multiple_choice';
-            Question::create($q);
+            Question::firstOrCreate(
+                [
+                    'topic_id' => $topicId,
+                    'quiz_level' => $q['quiz_level'],
+                    'question_text' => $q['question_text'],
+                ],
+                $q
+            );
         }
     }
 
@@ -316,7 +330,14 @@ class QuizLevel2And3Seeder extends Seeder
         foreach ($questions as $q) {
             $q['topic_id'] = $topicId;
             $q['type'] = 'multiple_choice';
-            Question::create($q);
+            Question::firstOrCreate(
+                [
+                    'topic_id' => $topicId,
+                    'quiz_level' => $q['quiz_level'],
+                    'question_text' => $q['question_text'],
+                ],
+                $q
+            );
         }
     }
 
@@ -411,7 +432,14 @@ class QuizLevel2And3Seeder extends Seeder
         foreach ($questions as $q) {
             $q['topic_id'] = $topicId;
             $q['type'] = 'multiple_choice';
-            Question::create($q);
+            Question::firstOrCreate(
+                [
+                    'topic_id' => $topicId,
+                    'quiz_level' => $q['quiz_level'],
+                    'question_text' => $q['question_text'],
+                ],
+                $q
+            );
         }
     }
 }

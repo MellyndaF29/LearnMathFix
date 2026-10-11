@@ -46,5 +46,11 @@ RUN npm run build
 # Beri hak akses ke folder storage dan cache agar Laravel bisa menulis log/session
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Buka port 80
 EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

@@ -54,6 +54,7 @@ class QuizController extends Controller
         return Inertia::render('Quiz/Show', [
             'topic' => $topic->only(['id', 'title', 'slug', 'icon', 'color']),
             'questions' => $questions,
+            'currentLevel' => $currentLevel,
         ]);
     }
 

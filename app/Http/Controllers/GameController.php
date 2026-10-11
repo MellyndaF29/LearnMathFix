@@ -6,7 +6,7 @@ use App\Models\GameProgress;
 use App\Models\Question;
 use App\Models\QuizAttempt;
 use App\Models\Topic;
-use App\Models\UserProgress;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,100 +19,57 @@ class GameController extends Controller
     {
         $userId = $request->user()->id;
 
-        // Ensure game stages are initialized
+        // Ensure game stages are initialized and unlock statuses are up to date
         $this->initializeGameStages($userId);
+        $this->updateUnlockStatuses($userId);
 
-        // Update unlock status based on Topic completion (Quiz level 3 passed)
-        $topics = Topic::orderBy('order')->get();
-        foreach ($topics as $index => $topic) {
-            $stage = $index + 1;
-
-            $passedLevels = QuizAttempt::where('user_id', $userId)
-                ->where('topic_id', $topic->id)
-                ->where('is_passed', true)
-                ->pluck('quiz_level')
-                ->toArray();
-
-            $availableLevels = $topic->questions()
-                ->reorder()
-                ->where('type', 'multiple_choice')
-                ->select('quiz_level')
-                ->distinct()
-                ->orderBy('quiz_level')
-                ->pluck('quiz_level')
-                ->toArray();
-
-            $maxAvailableLevel = count($availableLevels) > 0 ? max($availableLevels) : 0;
-
-            if ($maxAvailableLevel > 0) {
-                // Unlocked if they passed the highest available quiz level for this topic
-                $isUnlocked = in_array($maxAvailableLevel, $passedLevels);
-            } else {
-                // If no quizzes exist, unlock if they completed all sections
-                $sectionsCount = $topic->sections()->count();
-                $completedCount = UserProgress::where('user_id', $userId)
-                    ->where('topic_id', $topic->id)
-                    ->where('is_completed', true)
-                    ->count();
-                $isUnlocked = $sectionsCount > 0 && $completedCount >= $sectionsCount;
-            }
-
-            GameProgress::where('user_id', $userId)
-                ->where('stage', $stage)
-                ->update(['is_unlocked' => $isUnlocked]);
-        }
+        $topics = Topic::where('is_published', true)->orderBy('order')->get()->keyBy('order');
 
         $stages = GameProgress::where('user_id', $userId)
             ->orderBy('stage')
             ->get()
-            ->map(fn (GameProgress $gp) => [
-                'stage' => $gp->stage,
-                'isUnlocked' => $gp->is_unlocked,
-                'isCompleted' => $gp->is_completed,
-                'stars' => $gp->stars,
-                'bestScore' => $gp->best_score,
-                'label' => $this->getStageLabel($gp->stage),
-                'description' => $this->getStageDescription($gp->stage),
-            ]);
+            ->map(function (GameProgress $gp) use ($topics) {
+                $topic = $topics->get($gp->stage);
+
+                return [
+                    'stage' => $gp->stage,
+                    'isUnlocked' => $gp->is_unlocked,
+                    'isCompleted' => $gp->is_completed,
+                    'stars' => $gp->stars,
+                    'bestScore' => $gp->best_score,
+                    'label' => $this->getStageLabel($gp->stage),
+                    'description' => $this->getStageDescription($gp->stage),
+                    'topicSlug' => $topic?->slug,
+                    'topicTitle' => $topic?->title,
+                ];
+            });
 
         return Inertia::render('Game/Index', [
             'stages' => $stages,
         ]);
     }
 
-    public function play(Request $request, int $stage): Response
+    public function play(Request $request, int $stage): Response|RedirectResponse
     {
         $userId = $request->user()->id;
+
+        // Always sync unlock status first
+        $this->initializeGameStages($userId);
+        $this->updateUnlockStatuses($userId);
+
         $gameProgress = GameProgress::where('user_id', $userId)
             ->where('stage', $stage)
             ->firstOrFail();
 
         if (! $gameProgress->is_unlocked) {
-            return redirect()->route('game.index');
+            return redirect()->route('game.index')->with('error', 'Selesaikan Kuis Level 3 untuk membuka peta ini!');
         }
-
-        $topicForStage = Topic::where('order', $stage)->where('is_published', true)->first()
-            ?? Topic::where('is_published', true)->first();
 
         $questions = collect();
-        if ($topicForStage) {
-            $questions = $topicForStage->questions()
-                ->where('type', 'game')
-                ->inRandomOrder()
-                ->take(9)
-                ->get()
-                ->map(fn (Question $q) => [
-                    'id' => $q->id,
-                    'questionText' => $q->question_text,
-                    'options' => $q->options,
-                    'correctAnswer' => $q->correct_answer,
-                ]);
-        }
 
-        // If no game questions, use multiple choice questions instead
-        if ($questions->isEmpty() && $topicForStage) {
-            $questions = $topicForStage->questions()
-                ->where('type', 'multiple_choice')
+        if ($stage === 5) {
+            // Stage 5 is the final mixed summit: pick 9 random questions from all topics
+            $questions = Question::where('type', 'multiple_choice')
                 ->inRandomOrder()
                 ->take(9)
                 ->get()
@@ -122,6 +79,37 @@ class GameController extends Controller
                     'options' => $q->options,
                     'correctAnswer' => $q->correct_answer,
                 ]);
+        } else {
+            $topicForStage = Topic::where('order', $stage)->where('is_published', true)->first();
+
+            if ($topicForStage) {
+                $questions = $topicForStage->questions()
+                    ->where('type', 'game')
+                    ->inRandomOrder()
+                    ->take(9)
+                    ->get()
+                    ->map(fn (Question $q) => [
+                        'id' => $q->id,
+                        'questionText' => $q->question_text,
+                        'options' => $q->options,
+                        'correctAnswer' => $q->correct_answer,
+                    ]);
+
+                // Fallback to multiple choice if no dedicated game questions
+                if ($questions->isEmpty()) {
+                    $questions = $topicForStage->questions()
+                        ->where('type', 'multiple_choice')
+                        ->inRandomOrder()
+                        ->take(9)
+                        ->get()
+                        ->map(fn (Question $q) => [
+                            'id' => $q->id,
+                            'questionText' => $q->question_text,
+                            'options' => $q->options,
+                            'correctAnswer' => $q->correct_answer,
+                        ]);
+                }
+            }
         }
 
         return Inertia::render('Game/Play', [
@@ -207,6 +195,34 @@ class GameController extends Controller
                 ['is_unlocked' => false, 'is_completed' => false, 'stars' => 0, 'best_score' => 0]
             );
         }
+    }
+
+    private function updateUnlockStatuses(int $userId): void
+    {
+        $topics = Topic::where('is_published', true)->orderBy('order')->get();
+        $allQuizLevel3Passed = true;
+
+        foreach ($topics as $index => $topic) {
+            $stage = $index + 1;
+            $hasPassedLevel3 = QuizAttempt::where('user_id', $userId)
+                ->where('topic_id', $topic->id)
+                ->where('quiz_level', 3)
+                ->where('is_passed', true)
+                ->exists();
+
+            if (! $hasPassedLevel3) {
+                $allQuizLevel3Passed = false;
+            }
+
+            GameProgress::where('user_id', $userId)
+                ->where('stage', $stage)
+                ->update(['is_unlocked' => $hasPassedLevel3]);
+        }
+
+        // Stage 5 is unlocked only if all published topics have passed quiz level 3
+        GameProgress::where('user_id', $userId)
+            ->where('stage', 5)
+            ->update(['is_unlocked' => $allQuizLevel3Passed && $topics->count() > 0]);
     }
 
     private function calculateStars(int $correct, int $total): int
