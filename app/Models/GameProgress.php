@@ -24,6 +24,8 @@ class GameProgress extends Model
         'is_unlocked' => 'boolean',
         'is_completed' => 'boolean',
         'completed_checkpoints' => 'array',
+        'player_x' => 'float',
+        'player_y' => 'float',
     ];
 
     public function user(): BelongsTo

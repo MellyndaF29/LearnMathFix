@@ -204,8 +204,11 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
     const [sparkle,       setSparkle]       = useState(null);
 
     /* ── Physics / game loop refs ── */
-    const initialX = playerPosition?.x && playerPosition?.x !== 50 ? playerPosition.x : currentMap.startPos.x;
-    const initialY = playerPosition?.y && playerPosition?.y !== 50 ? playerPosition.y : currentMap.startPos.y;
+    const rawX = Number(playerPosition?.x);
+    const rawY = Number(playerPosition?.y);
+    const hasValidSavedPos = !isNaN(rawX) && !isNaN(rawY) && (rawX !== 50 || rawY !== 50);
+    const initialX        = hasValidSavedPos ? rawX : Number(currentMap.startPos.x);
+    const initialY        = hasValidSavedPos ? rawY : Number(currentMap.startPos.y);
     const charXRef        = useRef(initialX);
     const charYRef        = useRef(initialY);
     const facingLeftRef   = useRef(false);
@@ -239,22 +242,39 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
     /* ── Keyboard ── */
     useEffect(() => {
         const onDown = (e) => {
-            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                e.preventDefault();
+            }
             keysRef.current[e.key] = true;
+            if (e.key) keysRef.current[e.key.toLowerCase()] = true;
+            if (e.code) keysRef.current[e.code] = true;
 
-            if ((e.key === 'e' || e.key === 'E' || e.key === ' ') && gamePhaseRef.current === 'playing') {
+            const isAction = e.key === 'e' || e.key === 'E' || e.key === ' ' || e.code === 'KeyE' || e.code === 'Space';
+            if (isAction && gamePhaseRef.current === 'playing') {
                 const nearby = nearCrystalRef.current;
                 if (nearby !== null && !completedCPsRef.current.includes(nearby)) {
                     triggerQuestion(nearby);
                 }
             }
         };
-        const onUp = (e) => { delete keysRef.current[e.key]; };
+
+        const onUp = (e) => {
+            delete keysRef.current[e.key];
+            if (e.key) delete keysRef.current[e.key.toLowerCase()];
+            if (e.code) delete keysRef.current[e.code];
+        };
+
+        const onBlur = () => {
+            keysRef.current = {};
+        };
+
         window.addEventListener('keydown', onDown);
         window.addEventListener('keyup',   onUp);
+        window.addEventListener('blur',    onBlur);
         return () => {
             window.removeEventListener('keydown', onDown);
             window.removeEventListener('keyup',   onUp);
+            window.removeEventListener('blur',    onBlur);
         };
     }, []);
 
@@ -278,10 +298,12 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
 
                 /* ─ Character movement (keyboard + virtual joystick) ─ */
                 let dx = 0, dy = 0;
-                if (keysRef.current['ArrowUp']    || keysRef.current['w'] || keysRef.current['W']) dy -= SPEED;
-                if (keysRef.current['ArrowDown']   || keysRef.current['s'] || keysRef.current['S']) dy += SPEED;
-                if (keysRef.current['ArrowLeft']   || keysRef.current['a'] || keysRef.current['A']) dx -= SPEED;
-                if (keysRef.current['ArrowRight']  || keysRef.current['d'] || keysRef.current['D']) dx += SPEED;
+                const k = keysRef.current;
+                if (k['ArrowUp']    || k['KeyW'] || k['w'] || k['W']) dy -= SPEED;
+                if (k['ArrowDown']  || k['KeyS'] || k['s'] || k['S']) dy += SPEED;
+                if (k['ArrowLeft']  || k['KeyA'] || k['a'] || k['A']) dx -= SPEED;
+                if (k['ArrowRight'] || k['KeyD'] || k['d'] || k['D']) dx += SPEED;
+
                 // Virtual joystick (touch)
                 const td = touchDirRef.current;
                 if (td.x || td.y) { dx += td.x * SPEED; dy += td.y * SPEED; }
@@ -296,12 +318,23 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
                     }
                 }
 
-                if (dx || dy) {
-                    charXRef.current = Math.max(CHAR_R, Math.min(100 - CHAR_R, charXRef.current + dx));
-                    charYRef.current = Math.max(CHAR_R, Math.min(98  - CHAR_R, charYRef.current + dy));
+                if (dx !== 0 || dy !== 0) {
+                    const currentX = typeof charXRef.current === 'number' && !isNaN(charXRef.current)
+                        ? charXRef.current
+                        : Number(currentMap.startPos.x);
+                    const currentY = typeof charYRef.current === 'number' && !isNaN(charYRef.current)
+                        ? charYRef.current
+                        : Number(currentMap.startPos.y);
+
+                    const newX = Math.max(CHAR_R, Math.min(100 - CHAR_R, currentX + dx));
+                    const newY = Math.max(CHAR_R, Math.min(98  - CHAR_R, currentY + dy));
+
+                    charXRef.current = newX;
+                    charYRef.current = newY;
+
                     if (charDivRef.current) {
-                        charDivRef.current.style.left = `${charXRef.current}%`;
-                        charDivRef.current.style.top  = `${charYRef.current}%`;
+                        charDivRef.current.style.left = `${newX}%`;
+                        charDivRef.current.style.top  = `${newY}%`;
                     }
                     if (dx < 0 && !facingLeftRef.current) { facingLeftRef.current = true;  setFacingLeft(true);  }
                     else if (dx > 0 &&  facingLeftRef.current) { facingLeftRef.current = false; setFacingLeft(false); }

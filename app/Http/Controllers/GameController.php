@@ -118,8 +118,8 @@ class GameController extends Controller
             'questions' => $questions,
             'currentStars' => $gameProgress->stars,
             'playerPosition' => [
-                'x' => $gameProgress->player_x ?? 50,
-                'y' => $gameProgress->player_y ?? 50,
+                'x' => (float) ($gameProgress->player_x ?? 50),
+                'y' => (float) ($gameProgress->player_y ?? 50),
             ],
             'activeCheckpoint' => $gameProgress->active_checkpoint,
             'completedCheckpoints' => $gameProgress->completed_checkpoints ?? [],
