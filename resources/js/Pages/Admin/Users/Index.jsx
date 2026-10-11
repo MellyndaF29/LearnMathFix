@@ -24,44 +24,44 @@ export default function AdminUsers({ users, filters }) {
         <AdminLayout>
             <Head title="Kelola Pengguna" />
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="font-cinzel text-2xl font-bold text-white mb-1">Kelola Pengguna</h1>
                     <p className="text-white/50 text-sm">Total {users.total} pengguna terdaftar.</p>
                 </div>
 
                 {/* Search and Action */}
-                <div className="flex gap-2 items-center">
+                <div className="flex flex-wrap gap-2.5 items-center">
                     <Link
                         href={route('admin.users.create')}
-                        className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5 no-underline"
-                        style={{ background: 'linear-gradient(135deg, #1f4fbf, #0d1f4d)', color: '#fff', border: '1px solid rgba(143,180,255,0.25)' }}
-                    >
-                        + Tambah Pengguna
-                    </Link>
-                    <form onSubmit={handleSearch} className="flex gap-2">
-                    <input
-                        id="search-users"
-                        type="text"
-                        placeholder="Cari nama / email..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="rounded-xl px-4 py-2 text-sm text-white placeholder-white/30 outline-none focus:ring-2 transition-all"
-                        style={{
-                            background: 'rgba(255,255,255,0.06)',
-                            border: '1px solid rgba(255,255,255,0.12)',
-                            '--tw-ring-color': 'rgba(201,164,92,0.4)',
-                        }}
-                    />
-                    <button
-                        type="submit"
-                        className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5"
+                        className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5 no-underline shadow-md flex items-center gap-1.5"
                         style={{ background: 'linear-gradient(135deg, #ecd39a, #c9a45c)', color: '#081436' }}
                     >
-                        Cari
-                    </button>
-                </form>
-            </div>
+                        <span>➕</span> Tambah Pengguna Baru
+                    </Link>
+                    <form onSubmit={handleSearch} className="flex gap-2 flex-1 sm:flex-initial">
+                        <input
+                            id="search-users"
+                            type="text"
+                            placeholder="Cari nama / email..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="rounded-xl px-4 py-2 text-sm text-white placeholder-white/30 outline-none focus:ring-2 transition-all flex-1 sm:w-56"
+                            style={{
+                                background: 'rgba(255,255,255,0.06)',
+                                border: '1px solid rgba(255,255,255,0.12)',
+                                '--tw-ring-color': 'rgba(201,164,92,0.4)',
+                            }}
+                        />
+                        <button
+                            type="submit"
+                            className="px-4 py-2 rounded-xl text-sm font-bold transition-all hover:-translate-y-0.5"
+                            style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+                        >
+                            Cari
+                        </button>
+                    </form>
+                </div>
             </div>
 
             {/* Table */}

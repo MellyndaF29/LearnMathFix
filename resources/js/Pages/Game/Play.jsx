@@ -576,26 +576,54 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
             <Head title={`Peta ${stage}: ${stageLabel}`}/>
             <div className="max-w-5xl mx-auto">
 
-                {/* ─── HUD ─── */}
-                <div className={`px-4 py-3 flex justify-between items-center mb-3 rounded-[20px] border backdrop-blur-md transition-all duration-300 ${hitFlash ? 'bg-red-900/40 border-red-500/60' : 'bg-white/5 border-white/10'}`}>
-                    <Link href={route('game.index')} className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-all flex-shrink-0">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                        </svg>
-                    </Link>
-                    <div className="text-center min-w-0 mx-2">
-                        <div className="text-bronze-light font-bold text-[10px] sm:text-xs uppercase tracking-widest mb-0.5 truncate">Peta {stage}</div>
-                        <div className="font-cinzel text-sm sm:text-lg font-bold text-white truncate">{stageLabel}</div>
-                    </div>
-                    <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-                        <div className="flex gap-0.5 sm:gap-1">
-                            {[...Array(3)].map((_,i) => (
-                                <span key={i} className={`text-base sm:text-xl transition-all duration-500 ${i < lives ? '' : 'grayscale opacity-25 scale-75'}`}>❤️</span>
+                {/* ─── HUD (Di Luar Layar Game) ─── */}
+                <div className={`p-3 sm:px-4 sm:py-3.5 mb-3 rounded-[22px] border backdrop-blur-md transition-all duration-300 flex flex-col gap-2.5 ${hitFlash ? 'bg-red-900/40 border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.35)]' : 'bg-white/5 border-white/10 shadow-xl'}`}>
+                    {/* Baris 1: Tombol Kembali, Info Peta, dan Nyawa */}
+                    <div className="flex justify-between items-center">
+                        <Link href={route('game.index')} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-all flex-shrink-0" title="Kembali ke Peta">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                        </Link>
+                        <div className="text-center min-w-0 mx-2">
+                            <div className="text-bronze-light font-bold text-[9px] sm:text-xs uppercase tracking-widest leading-none mb-1 truncate">Peta {stage}</div>
+                            <div className="font-cinzel text-xs sm:text-base font-bold text-white leading-tight truncate">{stageLabel}</div>
+                        </div>
+                        <div className="flex items-center gap-1 bg-black/40 px-2 sm:px-2.5 py-1 rounded-full border border-white/10 flex-shrink-0">
+                            {[...Array(3)].map((_, i) => (
+                                <span key={i} className={`text-xs sm:text-base transition-all duration-500 ${i < lives ? '' : 'grayscale opacity-25 scale-75'}`}>❤️</span>
                             ))}
                         </div>
-                        <div className="bg-black/40 rounded-full px-3 py-1.5 border border-bronze/30 text-xs sm:text-sm font-bold text-bronze-light flex items-center gap-1.5">
-                            <span>💎</span> {completedCPs.length}/{questions.length}
+                    </div>
+
+                    {/* Baris 2: Penghitung Kristal, Progress Bar, & Info Target */}
+                    <div className="flex items-center justify-between gap-2.5 pt-2 border-t border-white/10">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-base sm:text-lg flex-shrink-0">💎</span>
+                            <div className="flex-1 h-2 sm:h-2.5 bg-white/15 rounded-full overflow-hidden border border-white/10">
+                                <div
+                                    className="h-full rounded-full transition-all duration-700"
+                                    style={{
+                                        width: `${questions.length ? (completedCPs.length / questions.length) * 100 : 0}%`,
+                                        background: 'linear-gradient(90deg, #fbbf24, #4ade80)',
+                                    }}
+                                />
+                            </div>
+                            <span className="text-amber-300 font-extrabold text-xs sm:text-sm whitespace-nowrap">
+                                {completedCPs.length}/{questions.length}
+                            </span>
                         </div>
+
+                        {nextCrystalToCollect < crystals.length && gamePhase === 'playing' ? (
+                            <div className="flex-shrink-0 bg-amber-500/15 border border-amber-500/40 rounded-full px-2.5 py-0.5 text-amber-300 text-[10px] sm:text-xs font-black shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                                <span>🎯</span> Kristal {nextCrystalToCollect + 1}
+                                <span className="text-purple-300 text-[9px] sm:text-[10px] font-bold">⚠ Hantu!</span>
+                            </div>
+                        ) : completedCPs.length >= questions.length && questions.length > 0 ? (
+                            <div className="flex-shrink-0 bg-green-500/20 border border-green-500/50 rounded-full px-2.5 py-0.5 text-green-300 text-[10px] sm:text-xs font-black whitespace-nowrap">
+                                🎉 Selesai!
+                            </div>
+                        ) : null}
                     </div>
                 </div>
 
@@ -758,33 +786,7 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
                             <div className="absolute inset-0 bg-red-500/20 pointer-events-none z-50 rounded-[32px]" style={{ animation:'flashOverlay 0.5s ease-out forwards' }}/>
                         )}
 
-                        {/* ── PROGRESS BAR (in-game) ── */}
-                        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/65 backdrop-blur-md rounded-full px-5 py-2.5 flex items-center gap-3 border border-white/10 shadow-lg z-10 pointer-events-none">
-                            <span className="text-xl">💎</span>
-                            <div className="w-36 h-2.5 bg-white/20 rounded-full overflow-hidden">
-                                <div className="h-full rounded-full transition-all duration-700"
-                                    style={{ width:`${questions.length ? (completedCPs.length/questions.length)*100 : 0}%`, background:'linear-gradient(to right,#fbbf24,#4ade80)' }}/>
-                            </div>
-                            <span className="text-white font-bold text-xs">{completedCPs.length}/{questions.length}</span>
-                        </div>
 
-                        {/* ── BOTTOM INSTRUCTION BAR (desktop only) ── */}
-                        {nextCrystalToCollect < crystals.length && gamePhase === 'playing' && (
-                            <div className="hidden md:flex absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/65 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-amber-500/35 text-white/80 text-xs font-semibold shadow-lg z-10 pointer-events-none items-center gap-3">
-                                <span className="text-amber-400 text-base">💎</span>
-                                Kumpulkan kristal <span className="text-amber-300 font-black">{nextCrystalToCollect + 1}</span>
-                                <span className="w-px h-4 bg-white/20"/>
-                                <span className="text-white/50">WASD/↑↓←→ Gerak</span>
-                                <span className="text-white/50">E/Spasi Ambil</span>
-                                <span className="text-purple-400">⚠ Hindari hantu!</span>
-                            </div>
-                        )}
-                        {/* Mobile: crystal target label */}
-                        {nextCrystalToCollect < crystals.length && gamePhase === 'playing' && (
-                            <div className="md:hidden absolute top-14 left-1/2 -translate-x-1/2 bg-black/65 backdrop-blur-md rounded-full px-3 py-1 border border-amber-500/30 text-amber-300 text-[11px] font-black shadow-lg z-10 pointer-events-none whitespace-nowrap">
-                                💎 Kristal {nextCrystalToCollect + 1} ⚠ Hindari hantu!
-                            </div>
-                        )}
                         {completedCPs.length >= questions.length && questions.length > 0 && gamePhase === 'playing' && (
                             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/65 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-green-500/50 text-green-300 text-xs font-black shadow-lg z-10 pointer-events-none">
                                 🎉 Semua kristal terkumpul!

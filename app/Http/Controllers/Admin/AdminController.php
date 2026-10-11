@@ -62,15 +62,18 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
+            'is_admin' => 'nullable|boolean',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
+            'email_verified_at' => now(),
+            'is_admin' => $request->boolean('is_admin'),
         ]);
 
-        return redirect()->route('admin.users')->with('success', 'Pengguna berhasil ditambahkan.');
+        return redirect()->route('admin.users')->with('success', "Akun untuk {$user->name} ({$user->email}) berhasil dibuat dan langsung aktif.");
     }
 
     public function toggleAdmin(User $user): RedirectResponse

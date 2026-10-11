@@ -31,9 +31,18 @@ export default function AdminDashboard({ stats, recentUsers }) {
         <AdminLayout>
             <Head title="Admin Dashboard" />
 
-            <div className="mb-8">
-                <h1 className="font-cinzel text-3xl font-bold text-white mb-1">Dashboard Admin</h1>
-                <p className="text-white/50 text-sm">Kelola konten dan pengguna LearnMath dari sini.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="font-cinzel text-3xl font-bold text-white mb-1">Dashboard Admin</h1>
+                    <p className="text-white/50 text-sm">Kelola konten dan pembeli akun LearnMath dari sini.</p>
+                </div>
+                <Link
+                    href={route('admin.users.create')}
+                    className="px-5 py-2.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 no-underline flex items-center gap-2 self-start sm:self-auto shadow-lg"
+                    style={{ background: 'linear-gradient(135deg, #ecd39a, #c9a45c)', color: '#081436' }}
+                >
+                    <span>➕</span> Tambah Akun Pembeli
+                </Link>
             </div>
 
             {/* Stat Grid */}
@@ -50,19 +59,20 @@ export default function AdminDashboard({ stats, recentUsers }) {
             <h2 className="font-cinzel text-base text-white/70 mb-4 font-bold uppercase tracking-wider">
                 Akses Cepat
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                 {[
-                    { label: 'Kelola Topik',    href: route('admin.topics'), icon: '📚', desc: 'Tambah, ubah, atau hapus topik materi.' },
-                    { label: 'Kelola Pengguna', href: route('admin.users'),  icon: '👥', desc: 'Lihat semua pengguna dan atur hak akses admin.' },
-                    { label: 'Kembali ke App',  href: route('dashboard'),    icon: '🏠', desc: 'Buka tampilan pengguna biasa.' },
+                    { label: 'Tambah Akun Pembeli', href: route('admin.users.create'), icon: '➕', desc: 'Buat akun langsung aktif untuk pembeli baru.', highlight: true },
+                    { label: 'Kelola Pengguna',     href: route('admin.users'),        icon: '👥', desc: 'Daftar semua pengguna dan atur hak akses admin.' },
+                    { label: 'Kelola Topik',        href: route('admin.topics'),       icon: '📚', desc: 'Tambah, ubah, atau hapus topik materi.' },
+                    { label: 'Kembali ke App',      href: route('dashboard'),          icon: '🏠', desc: 'Buka tampilan pengguna biasa.' },
                 ].map((item) => (
                     <Link
                         key={item.label}
                         href={item.href}
                         className="no-underline rounded-[18px] p-5 flex items-start gap-4 hover:-translate-y-1 transition-all group"
                         style={{
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.1)',
+                            background: item.highlight ? 'linear-gradient(135deg, rgba(201,164,92,0.18), rgba(8,20,68,0.7))' : 'rgba(255,255,255,0.04)',
+                            border: item.highlight ? '1px solid rgba(201,164,92,0.4)' : '1px solid rgba(255,255,255,0.1)',
                             backdropFilter: 'blur(12px)',
                         }}
                     >
@@ -76,9 +86,17 @@ export default function AdminDashboard({ stats, recentUsers }) {
             </div>
 
             {/* Recent Users */}
-            <h2 className="font-cinzel text-base text-white/70 mb-4 font-bold uppercase tracking-wider">
-                Pengguna Terbaru
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="font-cinzel text-base text-white/70 font-bold uppercase tracking-wider">
+                    Pengguna Terbaru
+                </h2>
+                <Link
+                    href={route('admin.users.create')}
+                    className="text-xs font-bold text-bronze-light hover:text-white transition-colors no-underline flex items-center gap-1"
+                >
+                    + Tambah Pembeli
+                </Link>
+            </div>
             <div
                 className="rounded-[20px] overflow-hidden"
                 style={{
