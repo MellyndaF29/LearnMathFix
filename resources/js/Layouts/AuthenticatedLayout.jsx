@@ -93,6 +93,7 @@ export default function AuthenticatedLayout({ user, children }) {
                      background: 'rgba(8,20,68,0.95)',
                      backdropFilter: 'blur(20px)',
                      borderTop: '1px solid rgba(201,164,92,0.25)',
+                     paddingBottom: 'max(0px, env(safe-area-inset-bottom))',
                  }}>
                 {navItems.map((item) => {
                     const isActive = url.startsWith(item.match);
@@ -100,7 +101,7 @@ export default function AuthenticatedLayout({ user, children }) {
                         <Link
                             key={item.name}
                             href={item.href}
-                            className={`flex-1 flex flex-col items-center gap-0.5 py-3 text-xs font-bold transition-colors no-underline ${
+                            className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-xs font-bold transition-colors no-underline ${
                                 isActive ? 'text-bronze-light' : 'text-white/30 hover:text-white/60'
                             }`}
                         >
@@ -112,7 +113,7 @@ export default function AuthenticatedLayout({ user, children }) {
             </nav>
 
             {/* Main Content */}
-            <main className="flex-1 max-w-[1120px] w-full mx-auto px-5 py-6 pb-24 md:pb-8 relative z-10">
+            <main className="flex-1 max-w-[1120px] w-full mx-auto px-4 sm:px-5 py-5 sm:py-6 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8 relative z-10">
                 {children}
             </main>
         </div>

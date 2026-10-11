@@ -1,8 +1,72 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+
+/* ═══════════════════════════════════════════════════════════
+   VIRTUAL JOYSTICK COMPONENT (mobile only)
+═══════════════════════════════════════════════════════════ */
+function VirtualJoystick({ dirRef }) {
+    const baseRef  = useRef(null);
+    const thumbRef = useRef(null);
+    const touchId  = useRef(null);
+    const center   = useRef({ x: 0, y: 0 });
+    const MAX_R    = 38;
+
+    const resetThumb = useCallback(() => {
+        if (thumbRef.current) thumbRef.current.style.transform = 'translate(-50%,-50%)';
+        dirRef.current = { x: 0, y: 0 };
+        touchId.current = null;
+    }, [dirRef]);
+
+    const onStart = useCallback((e) => {
+        e.preventDefault();
+        const t = e.changedTouches[0];
+        touchId.current = t.identifier;
+        const r = baseRef.current.getBoundingClientRect();
+        center.current = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }, []);
+
+    const onMove = useCallback((e) => {
+        e.preventDefault();
+        for (const t of e.changedTouches) {
+            if (t.identifier !== touchId.current) continue;
+            const dx   = t.clientX - center.current.x;
+            const dy   = t.clientY - center.current.y;
+            const dist = Math.hypot(dx, dy);
+            const cd   = Math.min(dist, MAX_R);
+            const ang  = Math.atan2(dy, dx);
+            const nx   = Math.cos(ang) * cd;
+            const ny   = Math.sin(ang) * cd;
+            if (thumbRef.current)
+                thumbRef.current.style.transform = `translate(calc(-50% + ${nx}px), calc(-50% + ${ny}px))`;
+            dirRef.current = { x: nx / MAX_R, y: ny / MAX_R };
+            break;
+        }
+    }, [dirRef]);
+
+    const onEnd = useCallback((e) => {
+        e.preventDefault();
+        for (const t of e.changedTouches) {
+            if (t.identifier === touchId.current) { resetThumb(); break; }
+        }
+    }, [resetThumb]);
+
+    return (
+        <div
+            ref={baseRef}
+            className="joystick-base"
+            onTouchStart={onStart}
+            onTouchMove={onMove}
+            onTouchEnd={onEnd}
+            onTouchCancel={onEnd}
+            style={{ touchAction: 'none' }}
+        >
+            <div ref={thumbRef} className="joystick-thumb"/>
+        </div>
+    );
+}
 
 /* ═══════════════════════════════════════════════════════════
    CONSTANTS
@@ -230,6 +294,8 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
     const facingLeftRef   = useRef(false);
     const gamePhaseRef    = useRef('playing');
     const keysRef         = useRef({});
+    const touchDirRef     = useRef({ x: 0, y: 0 });  // virtual joystick
+    const touchActionRef  = useRef(false);             // action button
     const rafRef          = useRef(null);
     const animTimerRef    = useRef(0);
     const animFrameRef    = useRef(0);
@@ -293,13 +359,25 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
         const loop = () => {
             if (gamePhaseRef.current === 'playing') {
 
-                /* ─ Character movement ─ */
+                /* ─ Character movement (keyboard + virtual joystick) ─ */
                 let dx = 0, dy = 0;
                 if (keysRef.current['ArrowUp']    || keysRef.current['w'] || keysRef.current['W']) dy -= SPEED;
                 if (keysRef.current['ArrowDown']   || keysRef.current['s'] || keysRef.current['S']) dy += SPEED;
                 if (keysRef.current['ArrowLeft']   || keysRef.current['a'] || keysRef.current['A']) dx -= SPEED;
                 if (keysRef.current['ArrowRight']  || keysRef.current['d'] || keysRef.current['D']) dx += SPEED;
+                // Virtual joystick (touch)
+                const td = touchDirRef.current;
+                if (td.x || td.y) { dx += td.x * SPEED; dy += td.y * SPEED; }
                 if (dx && dy) { dx *= 0.707; dy *= 0.707; }
+
+                // Touch action button
+                if (touchActionRef.current && gamePhaseRef.current === 'playing') {
+                    touchActionRef.current = false;
+                    const nearby = nearCrystalRef.current;
+                    if (nearby !== null && !completedCPsRef.current.includes(nearby)) {
+                        triggerQuestion(nearby);
+                    }
+                }
 
                 if (dx || dy) {
                     charXRef.current = Math.max(CHAR_R, Math.min(100 - CHAR_R, charXRef.current + dx));
@@ -470,23 +548,23 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
             <div className="max-w-5xl mx-auto">
 
                 {/* ─── HUD ─── */}
-                <div className={`px-6 py-4 flex justify-between items-center mb-4 rounded-[24px] border backdrop-blur-md transition-all duration-300 ${hitFlash ? 'bg-red-900/40 border-red-500/60' : 'bg-white/5 border-white/10'}`}>
-                    <Link href={route('game.index')} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-all">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`px-4 py-3 flex justify-between items-center mb-3 rounded-[20px] border backdrop-blur-md transition-all duration-300 ${hitFlash ? 'bg-red-900/40 border-red-500/60' : 'bg-white/5 border-white/10'}`}>
+                    <Link href={route('game.index')} className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-all flex-shrink-0">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
                     </Link>
-                    <div className="text-center">
-                        <div className="text-bronze-light font-bold text-xs uppercase tracking-widest mb-0.5">Peta {stage}</div>
-                        <div className="font-cinzel text-lg font-bold text-white">{stageLabel}</div>
+                    <div className="text-center min-w-0 mx-2">
+                        <div className="text-bronze-light font-bold text-[10px] sm:text-xs uppercase tracking-widest mb-0.5 truncate">Peta {stage}</div>
+                        <div className="font-cinzel text-sm sm:text-lg font-bold text-white truncate">{stageLabel}</div>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex gap-1">
+                    <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                        <div className="flex gap-0.5 sm:gap-1">
                             {[...Array(3)].map((_,i) => (
-                                <span key={i} className={`text-xl transition-all duration-500 ${i < lives ? '' : 'grayscale opacity-25 scale-75'}`}>❤️</span>
+                                <span key={i} className={`text-base sm:text-xl transition-all duration-500 ${i < lives ? '' : 'grayscale opacity-25 scale-75'}`}>❤️</span>
                             ))}
                         </div>
-                        <div className="bg-black/40 rounded-full px-4 py-2 border border-bronze/30 text-sm font-bold text-bronze-light flex items-center gap-2">
+                        <div className="bg-black/40 rounded-full px-3 py-1.5 border border-bronze/30 text-xs sm:text-sm font-bold text-bronze-light flex items-center gap-1.5">
                             <span>💎</span> {completedCPs.length}/{questions.length}
                         </div>
                     </div>
@@ -494,8 +572,8 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
 
                 {/* ─── GAME MAP ─── */}
                 <div
-                    className={`relative w-full rounded-[32px] border overflow-hidden select-none transition-all duration-300 ${hitFlash ? 'border-red-500 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : 'border-white/10 shadow-2xl'}`}
-                    style={{ paddingBottom: '64%' }}
+                    className={`relative w-full rounded-[24px] sm:rounded-[32px] border overflow-hidden select-none transition-all duration-300 ${hitFlash ? 'border-red-500 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : 'border-white/10 shadow-2xl'}`}
+                    style={{ paddingBottom: 'clamp(75%, calc(100vw - 2rem), 64%)' }}
                 >
                     <div className="absolute inset-0">
 
@@ -625,9 +703,9 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                             <span className="text-white font-bold text-xs">{completedCPs.length}/{questions.length}</span>
                         </div>
 
-                        {/* ── BOTTOM INSTRUCTION BAR ── */}
+                        {/* ── BOTTOM INSTRUCTION BAR (desktop only) ── */}
                         {nextCrystalToCollect < crystals.length && gamePhase === 'playing' && (
-                            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/65 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-amber-500/35 text-white/80 text-xs font-semibold shadow-lg z-10 pointer-events-none flex items-center gap-3">
+                            <div className="hidden md:flex absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/65 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-amber-500/35 text-white/80 text-xs font-semibold shadow-lg z-10 pointer-events-none items-center gap-3">
                                 <span className="text-amber-400 text-base">💎</span>
                                 Kumpulkan kristal <span className="text-amber-300 font-black">{nextCrystalToCollect + 1}</span>
                                 <span className="w-px h-4 bg-white/20"/>
@@ -636,9 +714,42 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                                 <span className="text-purple-400">⚠ Hindari hantu!</span>
                             </div>
                         )}
+                        {/* Mobile: crystal target label */}
+                        {nextCrystalToCollect < crystals.length && gamePhase === 'playing' && (
+                            <div className="md:hidden absolute top-14 left-1/2 -translate-x-1/2 bg-black/65 backdrop-blur-md rounded-full px-3 py-1 border border-amber-500/30 text-amber-300 text-[11px] font-black shadow-lg z-10 pointer-events-none whitespace-nowrap">
+                                💎 Kristal {nextCrystalToCollect + 1} ⚠ Hindari hantu!
+                            </div>
+                        )}
                         {completedCPs.length >= questions.length && questions.length > 0 && gamePhase === 'playing' && (
                             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/65 backdrop-blur-md rounded-2xl px-5 py-2.5 border border-green-500/50 text-green-300 text-xs font-black shadow-lg z-10 pointer-events-none">
                                 🎉 Semua kristal terkumpul!
+                            </div>
+                        )}
+
+                        {/* ── MOBILE VIRTUAL CONTROLS ── */}
+                        {gamePhase === 'playing' && (
+                            <div className="md:hidden absolute bottom-0 left-0 right-0 flex items-end justify-between px-4 pb-4 z-25 pointer-events-none" style={{ zIndex: 25 }}>
+                                {/* Joystick (left) */}
+                                <div className="pointer-events-auto">
+                                    <VirtualJoystick dirRef={touchDirRef}/>
+                                </div>
+                                {/* Action button (right) */}
+                                <div className="pointer-events-auto flex flex-col items-center gap-2">
+                                    <div className="text-[10px] text-white/40 font-bold uppercase tracking-wide">Ambil</div>
+                                    <button
+                                        onTouchStart={(e) => { e.preventDefault(); touchActionRef.current = true; }}
+                                        onTouchEnd={(e) => { e.preventDefault(); }}
+                                        className="w-16 h-16 rounded-full flex items-center justify-center font-black text-xl text-amber-300 active:scale-90 transition-transform"
+                                        style={{
+                                            background: nearCrystal !== null ? 'rgba(251,191,36,0.3)' : 'rgba(255,255,255,0.08)',
+                                            border: nearCrystal !== null ? '2px solid rgba(251,191,36,0.7)' : '2px solid rgba(255,255,255,0.2)',
+                                            boxShadow: nearCrystal !== null ? '0 0 20px rgba(251,191,36,0.4)' : 'none',
+                                            touchAction: 'none',
+                                        }}
+                                    >
+                                        💎
+                                    </button>
+                                </div>
                             </div>
                         )}
 
@@ -675,24 +786,28 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
             {/* ═══ QUESTION MODAL ═══ */}
             <AnimatePresence>
                 {gamePhase === 'question' && currentQIdx !== null && questions[currentQIdx] && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
                         <motion.div initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }}
                             className="absolute inset-0 bg-black/82 backdrop-blur-2xl"/>
                         <motion.div
-                            initial={{ scale:0.88, opacity:0, y:40 }} animate={{ scale:1, opacity:1, y:0 }} exit={{ scale:0.88, opacity:0, y:40 }}
-                            className="relative w-full max-w-xl rounded-[40px] overflow-hidden border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.9)]"
+                            initial={{ y: '100%', opacity:0 }} animate={{ y:0, opacity:1 }} exit={{ y: '100%', opacity:0 }}
+                            className="relative w-full sm:max-w-xl rounded-t-[32px] sm:rounded-[40px] overflow-hidden border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.9)] max-h-[92vh] overflow-y-auto"
                             style={{ background:'linear-gradient(160deg,#0f172a,#020617)' }}
                         >
                             {/* Decorative crystal icon header */}
                             <div className="absolute top-0 left-0 right-0 h-px" style={{ background:'linear-gradient(90deg,transparent,rgba(251,191,36,0.6),transparent)' }}/>
-                            <div className="px-8 py-6 flex justify-between items-center" style={{ borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
-                                <div className="flex items-center gap-3 font-black text-sm uppercase tracking-widest text-amber-400">
-                                    <span className="text-2xl">💎</span>
-                                    Kristal {currentQIdx + 1} dari {questions.length}
+                            {/* Mobile drag handle */}
+                            <div className="sm:hidden flex justify-center pt-3 pb-1">
+                                <div className="w-10 h-1 bg-white/20 rounded-full"/>
+                            </div>
+                            <div className="px-5 sm:px-8 py-4 sm:py-6 flex justify-between items-center" style={{ borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
+                                <div className="flex items-center gap-2 sm:gap-3 font-black text-xs sm:text-sm uppercase tracking-widest text-amber-400">
+                                    <span className="text-xl sm:text-2xl">💎</span>
+                                    Kristal {currentQIdx + 1} / {questions.length}
                                 </div>
-                                <div className="flex items-center gap-3 bg-black/40 px-4 py-2 rounded-full border border-white/10">
+                                <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-white/10">
                                     <span className="text-xs text-white/50 font-bold uppercase tracking-wide">Waktu</span>
-                                    <span className={`font-black text-2xl leading-none ${timeLeft > 7 ? 'text-green-400' : 'text-red-400 animate-pulse'}`}>{timeLeft}s</span>
+                                    <span className={`font-black text-xl leading-none ${timeLeft > 7 ? 'text-green-400' : 'text-red-400 animate-pulse'}`}>{timeLeft}s</span>
                                 </div>
                             </div>
 
@@ -702,14 +817,14 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                                     style={{ width:`${(timeLeft/20)*100}%`, background: timeLeft > 7 ? '#22c55e' : '#ef4444' }}/>
                             </div>
 
-                            <div className="p-8">
+                            <div className="p-5 sm:p-8">
                                 {/* Question */}
-                                <div className={`text-center p-7 rounded-3xl border-2 mb-7 transition-all duration-300 ${
+                                <div className={`text-center p-5 sm:p-7 rounded-2xl sm:rounded-3xl border-2 mb-5 sm:mb-7 transition-all duration-300 ${
                                     feedbackState==='correct' ? 'border-green-500/50 bg-green-500/10' :
                                     feedbackState==='wrong'   ? 'border-red-500/50 bg-red-500/10'     :
                                     'border-white/10 bg-white/5'
                                 }`}>
-                                    <h3 className={`text-xl font-bold font-cinzel leading-relaxed ${
+                                    <h3 className={`text-base sm:text-xl font-bold font-cinzel leading-relaxed ${
                                         feedbackState==='correct' ? 'text-green-400' :
                                         feedbackState==='wrong'   ? 'text-red-400'   : 'text-white'
                                     }`}>
@@ -717,15 +832,15 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                                     </h3>
                                     {feedbackState && (
                                         <motion.div initial={{ opacity:0, scale:0.85 }} animate={{ opacity:1, scale:1 }}
-                                            className={`mt-4 font-black text-lg flex items-center justify-center gap-2 ${feedbackState==='correct' ? 'text-green-400' : 'text-red-400'}`}>
-                                            <span className="text-2xl">{feedbackState==='correct' ? '✅' : '❌'}</span>
+                                            className={`mt-3 font-black text-base flex items-center justify-center gap-2 ${feedbackState==='correct' ? 'text-green-400' : 'text-red-400'}`}>
+                                            <span className="text-xl">{feedbackState==='correct' ? '✅' : '❌'}</span>
                                             {feedbackText}
                                         </motion.div>
                                     )}
                                 </div>
 
                                 {/* Options */}
-                                <div className="grid grid-cols-1 gap-3">
+                                <div className="grid grid-cols-1 gap-2 sm:gap-3">
                                     {Object.entries(questions[currentQIdx].options).map(([key, val]) => {
                                         const q  = questions[currentQIdx];
                                         const iC = key === q.correctAnswer;
@@ -738,8 +853,8 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                                         }
                                         return (
                                             <button key={key} onClick={() => handleAnswer(key)} disabled={answered}
-                                                className={`flex items-center gap-5 p-5 rounded-2xl border-2 text-base font-bold transition-all duration-200 ${cls} ${!answered ? 'hover:-translate-y-0.5 hover:shadow-xl' : ''}`}>
-                                                <span className={`w-9 h-9 rounded-full flex items-center justify-center text-sm flex-shrink-0 font-black ${answered && iC ? 'bg-green-500 text-white shadow-lg' : answered && iU ? 'bg-red-500 text-white shadow-lg' : 'bg-white/10 text-white/70 border border-white/20'}`}>
+                                                className={`flex items-center gap-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 text-sm sm:text-base font-bold transition-all duration-200 ${cls} ${!answered ? 'active:scale-98' : ''}`}>
+                                                <span className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm flex-shrink-0 font-black ${answered && iC ? 'bg-green-500 text-white shadow-lg' : answered && iU ? 'bg-red-500 text-white shadow-lg' : 'bg-white/10 text-white/70 border border-white/20'}`}>
                                                     {key}
                                                 </span>
                                                 <span className="text-left leading-snug">{val}</span>
@@ -747,6 +862,8 @@ export default function Play({ auth, stage, stageLabel, questions, completedChec
                                         );
                                     })}
                                 </div>
+                                {/* Safe area spacer for iOS home indicator */}
+                                <div className="h-4 sm:hidden"/>
                             </div>
                         </motion.div>
                     </div>

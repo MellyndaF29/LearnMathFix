@@ -217,3 +217,67 @@
     line-height: 1.8;
     font-weight: 500;
 }
+
+/* ═══════════════════════════════════════════
+   MOBILE & TOUCH IMPROVEMENTS
+═══════════════════════════════════════════ */
+
+/* Prevent callouts & selection on game elements */
+.no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Remove tap highlight on interactive elements */
+button, a, label, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth momentum scrolling on iOS */
+.overflow-y-auto, .overflow-auto, .overflow-scroll {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Larger touch targets for small controls */
+@media (max-width: 768px) {
+    button:not(.game-btn), a:not(.nav-link) {
+        min-height: 44px;
+    }
+    /* Better font sizes on mobile to prevent zoom */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Safe area insets for iOS notch / home indicator */
+.safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+.safe-top {
+    padding-top: max(0px, env(safe-area-inset-top));
+}
+
+/* Virtual joystick */
+.joystick-base {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.2);
+    position: relative;
+    touch-action: none;
+}
+.joystick-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+    border: 2px solid rgba(255,255,255,0.6);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: box-shadow 0.1s;
+    box-shadow: 0 0 16px rgba(201,164,92,0.4);
+}
