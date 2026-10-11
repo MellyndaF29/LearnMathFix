@@ -125,9 +125,11 @@ class QuizController extends Controller
             ->toArray();
 
         $availableLevels = $topic->questions()
+            ->reorder()
             ->where('type', 'multiple_choice')
             ->select('quiz_level')
             ->distinct()
+            ->orderBy('quiz_level')
             ->pluck('quiz_level')
             ->toArray();
 
