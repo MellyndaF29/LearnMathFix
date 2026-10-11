@@ -156,6 +156,7 @@ class GameController extends Controller
         $validated = $request->validate([
             'answers' => 'required|array',
             'totalCount' => 'required|integer|min:1',
+            'score' => 'nullable|integer|min:0',
         ]);
 
         $userId = $request->user()->id;
@@ -170,13 +171,14 @@ class GameController extends Controller
         }
 
         $stars = $this->calculateStars($correctCount, $validated['totalCount']);
+        $finalScore = $validated['score'] ?? ($correctCount * 100);
 
         $progress = GameProgress::where('user_id', $userId)->where('stage', $stage)->first();
         if ($progress) {
             $progress->update([
                 'is_completed' => true,
                 'stars' => max($progress->stars, $stars),
-                'best_score' => max($progress->best_score, $correctCount),
+                'best_score' => max($progress->best_score, $finalScore),
                 'player_x' => 50,
                 'player_y' => 50,
                 'active_checkpoint' => null,

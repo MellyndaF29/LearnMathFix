@@ -281,6 +281,9 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
     const [hitFlash,      setHitFlash]      = useState(false);
     const [sparkle,       setSparkle]       = useState(null);
     const [controlMode,   setControlMode]   = useState('joystick'); // 'joystick' | 'dpad'
+    const initialScore                      = (initCompleted?.length || 0) * 100;
+    const [score,         setScore]         = useState(initialScore);
+    const autoCloseTimerRef                 = useRef(null);
 
     /* ── Physics / game loop refs ── */
     const rawX = Number(playerPosition?.x);
@@ -360,11 +363,18 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
     function triggerQuestion(idx) {
         const nextIdx = completedCPsRef.current.length;
         if (idx !== nextIdx) return;               // must collect in order!
+        if (autoCloseTimerRef.current) clearTimeout(autoCloseTimerRef.current);
+        const q = questions[idx];
+        if (q) {
+            setAnswers(p => { const copy = { ...p }; delete copy[q.id]; return copy; });
+            setResults(p => { const copy = { ...p }; delete copy[q.id]; return copy; });
+        }
         gamePhaseRef.current = 'question';
         setGamePhase('question');
         setCurrentQIdx(idx);
         setAnswered(false);
         setFeedbackState(null);
+        setFeedbackText('');
         setTimeLeft(20);
     }
 
@@ -500,7 +510,7 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
     useEffect(() => {
         if (gamePhase === 'finishing') {
             setIsSubmitting(true);
-            router.post(route('game.submit', stage), { answers, totalCount: questions.length },
+            router.post(route('game.submit', stage), { answers, totalCount: questions.length, score },
                 { onFinish: () => setIsSubmitting(false) });
         }
     }, [gamePhase]); // eslint-disable-line
@@ -517,34 +527,118 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
         return () => clearInterval(timerRef.current);
     }, [gamePhase, answered]); // eslint-disable-line
 
+    useEffect(() => {
+        return () => {
+            if (autoCloseTimerRef.current) clearTimeout(autoCloseTimerRef.current);
+        };
+    }, []);
+
     /* ── Handlers ── */
+    const retryQuestion = () => {
+        if (autoCloseTimerRef.current) clearTimeout(autoCloseTimerRef.current);
+        const q = questions[currentQIdx];
+        if (q) {
+            setAnswers(p => { const copy = { ...p }; delete copy[q.id]; return copy; });
+            setResults(p => { const copy = { ...p }; delete copy[q.id]; return copy; });
+        }
+        setAnswered(false);
+        setFeedbackState(null);
+        setFeedbackText('');
+        setTimeLeft(20);
+    };
+
+    const closeQuestionModal = () => {
+        if (autoCloseTimerRef.current) clearTimeout(autoCloseTimerRef.current);
+        gamePhaseRef.current = 'playing';
+        setGamePhase('playing');
+        setCurrentQIdx(null);
+        setAnswered(false);
+        setFeedbackState(null);
+        setFeedbackText('');
+        nearCrystalRef.current = null;
+        setNearCrystal(null);
+    };
+
     const handleTimeout = () => {
         if (answered) return;
-        const q = questions[currentQIdx];
+        clearInterval(timerRef.current);
+        if (autoCloseTimerRef.current) clearTimeout(autoCloseTimerRef.current);
         setAnswered(true);
-        setFeedbackState('wrong');
-        setFeedbackText('Waktu habis!');
+
+        const q = questions[currentQIdx];
         setAnswers(p => ({ ...p, [q.id]: null }));
         setResults(p => ({ ...p, [q.id]: 'wrong' }));
-        setTimeout(() => resumeGame(currentQIdx), 1800);
+
+        // Kurangi poin & nyawa
+        setScore(prev => Math.max(0, prev - 25));
+        const nextLives = Math.max(0, livesRef.current - 1);
+        livesRef.current = nextLives;
+        setLives(nextLives);
+        setHitFlash(true);
+        setTimeout(() => setHitFlash(false), 500);
+
+        setFeedbackState('wrong');
+
+        if (nextLives <= 0) {
+            setFeedbackText(`⏰ Waktu habis! Jawaban: ${q?.options?.[q?.correctAnswer] ?? ''}. Nyawa habis!`);
+            setTimeout(() => {
+                gamePhaseRef.current = 'gameover';
+                setGamePhase('gameover');
+            }, 1500);
+        } else {
+            setFeedbackText(`⏰ Waktu habis! (-25 Poin, -1 ❤️) Sisa: ${nextLives} Nyawa`);
+            autoCloseTimerRef.current = setTimeout(() => {
+                closeQuestionModal();
+            }, 6000);
+        }
     };
 
     const handleAnswer = (key) => {
         if (answered) return;
         clearInterval(timerRef.current);
+        if (autoCloseTimerRef.current) clearTimeout(autoCloseTimerRef.current);
         setAnswered(true);
+
         const q       = questions[currentQIdx];
         const correct = key === q.correctAnswer;
         setAnswers(p => ({ ...p, [q.id]: key }));
         setResults(p => ({ ...p, [q.id]: correct ? 'correct' : 'wrong' }));
-        setFeedbackState(correct ? 'correct' : 'wrong');
-        setFeedbackText(correct ? '💎 Kristal berhasil dikumpulkan!' : `Salah! Jawaban: ${q.options[q.correctAnswer]}`);
+
         if (correct) {
+            // JAWABAN BENAR: Kristal terkumpul, poin +100
+            setScore(prev => prev + 100);
+            setFeedbackState('correct');
+            setFeedbackText('💎 Benar! Kristal berhasil dikumpulkan (+100 Poin)');
             const cp = crystals[currentQIdx];
-            setSparkle({ x: cp.x, y: cp.y });
-            setTimeout(() => setSparkle(null), 900);
+            if (cp) {
+                setSparkle({ x: cp.x, y: cp.y });
+                setTimeout(() => setSparkle(null), 900);
+            }
+            setTimeout(() => resumeGame(currentQIdx), 1500);
+        } else {
+            // JAWABAN SALAH: Kristal TIDAK terkumpul, kurangi poin (-25) & nyawa (-1)
+            setScore(prev => Math.max(0, prev - 25));
+            const nextLives = Math.max(0, livesRef.current - 1);
+            livesRef.current = nextLives;
+            setLives(nextLives);
+            setHitFlash(true);
+            setTimeout(() => setHitFlash(false), 500);
+
+            setFeedbackState('wrong');
+
+            if (nextLives <= 0) {
+                setFeedbackText(`❌ Jawaban Salah! Jawaban benar: ${q.options[q.correctAnswer]}. Nyawa habis!`);
+                setTimeout(() => {
+                    gamePhaseRef.current = 'gameover';
+                    setGamePhase('gameover');
+                }, 1500);
+            } else {
+                setFeedbackText(`❌ Jawaban Kurang Tepat! (-25 Poin, -1 ❤️) Sisa: ${nextLives} Nyawa`);
+                autoCloseTimerRef.current = setTimeout(() => {
+                    closeQuestionModal();
+                }, 6000);
+            }
         }
-        setTimeout(() => resumeGame(currentQIdx), 1800);
     };
 
     const resumeGame = (idx) => {
@@ -558,12 +652,24 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
         setCurrentQIdx(null);
         setAnswered(false);
         setFeedbackState(null);
+        setFeedbackText('');
         nearCrystalRef.current = null;
         setNearCrystal(null);
         axios.post(route('game.save', stage), {
             player_x: charXRef.current, player_y: charYRef.current,
             active_checkpoint: idx, completed_checkpoints: completedCPsRef.current,
         }).catch(() => {});
+    };
+
+    const handleRestartStage = () => {
+        axios.post(route('game.save', stage), {
+            player_x: Number(currentMap.startPos.x),
+            player_y: Number(currentMap.startPos.y),
+            active_checkpoint: null,
+            completed_checkpoints: [],
+        }).finally(() => {
+            window.location.reload();
+        });
     };
 
     const nextCrystalToCollect = completedCPs.length;
@@ -578,21 +684,29 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
 
                 {/* ─── HUD (Di Luar Layar Game) ─── */}
                 <div className={`p-3 sm:px-4 sm:py-3.5 mb-3 rounded-[22px] border backdrop-blur-md transition-all duration-300 flex flex-col gap-2.5 ${hitFlash ? 'bg-red-900/40 border-red-500/60 shadow-[0_0_30px_rgba(239,68,68,0.35)]' : 'bg-white/5 border-white/10 shadow-xl'}`}>
-                    {/* Baris 1: Tombol Kembali, Info Peta, dan Nyawa */}
-                    <div className="flex justify-between items-center">
+                    {/* Baris 1: Tombol Kembali, Info Peta, Skor & Nyawa */}
+                    <div className="flex justify-between items-center gap-2">
                         <Link href={route('game.index')} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/25 transition-all flex-shrink-0" title="Kembali ke Peta">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                             </svg>
                         </Link>
-                        <div className="text-center min-w-0 mx-2">
+                        <div className="text-center min-w-0 mx-1">
                             <div className="text-bronze-light font-bold text-[9px] sm:text-xs uppercase tracking-widest leading-none mb-1 truncate">Peta {stage}</div>
                             <div className="font-cinzel text-xs sm:text-base font-bold text-white leading-tight truncate">{stageLabel}</div>
                         </div>
-                        <div className="flex items-center gap-1 bg-black/40 px-2 sm:px-2.5 py-1 rounded-full border border-white/10 flex-shrink-0">
-                            {[...Array(3)].map((_, i) => (
-                                <span key={i} className={`text-xs sm:text-base transition-all duration-500 ${i < lives ? '' : 'grayscale opacity-25 scale-75'}`}>❤️</span>
-                            ))}
+                        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                            {/* Skor Display */}
+                            <div className="flex items-center gap-1 bg-amber-500/15 border border-amber-500/30 px-2 sm:px-2.5 py-1 rounded-full text-amber-300 font-black text-[11px] sm:text-xs shadow-inner">
+                                <span className="text-xs sm:text-sm">⭐</span>
+                                <span>{score} Pts</span>
+                            </div>
+                            {/* Nyawa Display */}
+                            <div className="flex items-center gap-0.5 sm:gap-1 bg-black/40 px-1.5 sm:px-2.5 py-1 rounded-full border border-white/10">
+                                {[...Array(3)].map((_, i) => (
+                                    <span key={i} className={`text-xs sm:text-base transition-all duration-500 ${i < lives ? '' : 'grayscale opacity-25 scale-75'}`}>❤️</span>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
@@ -795,15 +909,15 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
 
                         {/* ── GAME OVER ── */}
                         {gamePhase === 'gameover' && (
-                            <div className="absolute inset-0 bg-black/82 backdrop-blur-sm flex items-center justify-center z-30 rounded-[32px]">
-                                <div className="text-center">
-                                    <div className="text-7xl mb-5" style={{ animation:'bounce 1s infinite' }}>💀</div>
-                                    <h2 className="font-cinzel text-4xl font-bold text-white mb-3">Nyawa Habis!</h2>
-                                    <p className="text-white/55 mb-8 text-sm">Terlalu banyak tertangkap hantu...</p>
-                                    <button onClick={() => window.location.reload()}
-                                        className="px-10 py-4 rounded-2xl font-bold text-navy-deep transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(201,164,92,0.4)]"
+                            <div className="absolute inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center z-30 rounded-[32px]">
+                                <div className="text-center p-6 sm:p-8 max-w-sm mx-auto">
+                                    <div className="text-6xl sm:text-7xl mb-4" style={{ animation:'bounce 1s infinite' }}>💀</div>
+                                    <h2 className="font-cinzel text-3xl sm:text-4xl font-bold text-white mb-2">Nyawa Habis!</h2>
+                                    <p className="text-white/60 mb-6 text-xs sm:text-sm">Terlalu banyak jawaban salah atau terkena hantu...</p>
+                                    <button onClick={handleRestartStage}
+                                        className="px-8 sm:px-10 py-3.5 sm:py-4 rounded-2xl font-black text-navy-deep text-sm sm:text-base transition-all hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(201,164,92,0.4)] active:scale-95"
                                         style={{ background:'linear-gradient(135deg,#ecd39a,#c9a45c)' }}>
-                                        Coba Lagi
+                                        Mulai Ulang Stage
                                     </button>
                                 </div>
                             </div>
@@ -934,15 +1048,27 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
                                         const iC = key === q.correctAnswer;
                                         const iU = answers[q.id] === key;
                                         let cls  = 'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/30 cursor-pointer';
+                                        let badgeCls = 'bg-white/10 text-white/70 border border-white/20';
+
                                         if (answered) {
-                                            if (iC) cls = 'bg-green-500/20 border-green-500/60 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.2)] cursor-default';
-                                            else if (iU) cls = 'bg-red-500/20 border-red-500/60 text-red-400 cursor-default';
-                                            else cls = 'bg-white/5 border-white/5 text-white/25 opacity-40 cursor-default';
+                                            if (feedbackState === 'correct' && iC) {
+                                                cls = 'bg-green-500/20 border-green-500/60 text-green-400 shadow-[0_0_20px_rgba(34,197,94,0.2)] cursor-default';
+                                                badgeCls = 'bg-green-500 text-white shadow-lg';
+                                            } else if (iU && feedbackState === 'wrong') {
+                                                cls = 'bg-red-500/20 border-red-500/60 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.2)] cursor-default';
+                                                badgeCls = 'bg-red-500 text-white shadow-lg';
+                                            } else if (lives <= 0 && iC) {
+                                                cls = 'bg-green-500/20 border-green-500/60 text-green-400 cursor-default';
+                                                badgeCls = 'bg-green-500 text-white shadow-lg';
+                                            } else {
+                                                cls = 'bg-white/5 border-white/5 text-white/25 opacity-40 cursor-default';
+                                            }
                                         }
+
                                         return (
                                             <button key={key} onClick={() => handleAnswer(key)} disabled={answered}
                                                 className={`flex items-center gap-4 p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 text-sm sm:text-base font-bold transition-all duration-200 ${cls} ${!answered ? 'active:scale-98' : ''}`}>
-                                                <span className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm flex-shrink-0 font-black ${answered && iC ? 'bg-green-500 text-white shadow-lg' : answered && iU ? 'bg-red-500 text-white shadow-lg' : 'bg-white/10 text-white/70 border border-white/20'}`}>
+                                                <span className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm flex-shrink-0 font-black ${badgeCls}`}>
                                                     {key}
                                                 </span>
                                                 <span className="text-left leading-snug">{val}</span>
@@ -950,6 +1076,28 @@ export default function Play({ auth, stage, stageLabel, questions, playerPositio
                                         );
                                     })}
                                 </div>
+
+                                {/* Retry / Return controls when answer is wrong and lives > 0 */}
+                                {answered && feedbackState === 'wrong' && lives > 0 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="mt-4 sm:mt-5 flex flex-col sm:flex-row items-center gap-2.5 sm:gap-3"
+                                    >
+                                        <button
+                                            onClick={retryQuestion}
+                                            className="w-full sm:flex-1 py-3.5 px-5 rounded-2xl font-black text-sm bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500 text-slate-950 shadow-[0_0_25px_rgba(251,191,36,0.4)] hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <span className="text-base">🔄</span> Coba Lagi Soal Ini
+                                        </button>
+                                        <button
+                                            onClick={closeQuestionModal}
+                                            className="w-full sm:w-auto py-3.5 px-5 rounded-2xl font-bold text-sm bg-white/10 hover:bg-white/20 text-white/90 border border-white/15 active:scale-98 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <span>🗺️</span> Kembali ke Peta
+                                        </button>
+                                    </motion.div>
+                                )}
                                 {/* Safe area spacer for iOS home indicator */}
                                 <div className="h-4 sm:hidden"/>
                             </div>
