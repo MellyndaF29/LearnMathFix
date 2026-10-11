@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="relative min-h-screen flex items-center justify-center px-4">
+        <div className="relative min-h-screen flex flex-col justify-center items-center py-6 sm:py-12 px-4">
 
             {/* Decorative blobs */}
             <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
@@ -13,7 +13,7 @@ export default function GuestLayout({ children }) {
             </div>
 
             {/* Card */}
-            <div className="relative z-10 w-full max-w-md">
+            <div className="relative z-10 w-full max-w-md my-auto">
                 {children}
             </div>
         </div>

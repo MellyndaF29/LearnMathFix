@@ -25,9 +25,9 @@ export default function Login({ status, canResetPassword }) {
             <div className="glass-dark-guest rounded-[28px] overflow-hidden">
                 <div className="accent-bar" />
 
-                <div className="px-10 py-10">
+                <div className="px-6 py-8 sm:px-10 sm:py-10">
                     {/* Logo + Brand */}
-                    <div className="flex flex-col items-center mb-10">
+                    <div className="flex flex-col items-center mb-8 sm:mb-10">
                         <Link href="/" className="flex flex-col items-center gap-3 no-underline group">
                             <img src="/logo.png" alt="LearnMath"
                                  className="w-16 h-16 rounded-2xl object-cover shadow-[0_0_24px_rgba(201,164,92,0.5)] group-hover:shadow-[0_0_32px_rgba(201,164,92,0.7)] transition-shadow" />

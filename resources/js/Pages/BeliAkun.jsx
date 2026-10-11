@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import GuestLayout from '@/Layouts/GuestLayout';
 
-export default function BeliAkun() {
+export default function BeliAkun({ auth }) {
     return (
         <GuestLayout>
             <Head title="Dapatkan Akses — LearnMath" />
@@ -18,9 +18,9 @@ export default function BeliAkun() {
                 <div className="h-[3px] w-full"
                      style={{ background: 'linear-gradient(90deg, #c9a45c, #ecd39a 50%, #c9a45c)' }} />
 
-                <div className="px-10 py-10">
+                <div className="px-5 py-7 sm:px-10 sm:py-10">
                     {/* Logo */}
-                    <div className="flex flex-col items-center mb-8">
+                    <div className="flex flex-col items-center mb-6 sm:mb-8">
                         <Link href={route('home')} className="flex flex-col items-center gap-2 no-underline">
                             <img src="/logo.png" alt="LearnMath"
                                  className="w-14 h-14 rounded-2xl object-cover shadow-[0_0_24px_rgba(201,164,92,0.5)]" />
@@ -96,10 +96,21 @@ export default function BeliAkun() {
 
                     <div className="text-center text-xs text-white/30 pt-4"
                          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                        Sudah punya akun?{' '}
-                        <Link href={route('login')} className="text-bronze-light/70 hover:text-bronze-light font-semibold no-underline transition-colors">
-                            Masuk di sini
-                        </Link>
+                        {auth?.user ? (
+                            <>
+                                Sudah login sebagai <strong className="text-white/70">{auth.user.name}</strong>.{' '}
+                                <Link href={route('dashboard')} className="text-bronze-light font-semibold hover:text-bronze-light/80 no-underline transition-colors ml-1">
+                                    Ke Beranda →
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                Sudah punya akun?{' '}
+                                <Link href={route('login')} className="text-bronze-light/70 hover:text-bronze-light font-semibold no-underline transition-colors">
+                                    Masuk di sini
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
