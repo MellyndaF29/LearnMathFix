@@ -63,9 +63,11 @@ class MateriController extends Controller
             ->toArray();
 
         $availableLevels = $topic->questions()
+            ->reorder()                      // strip the default orderBy('order') from the relation
             ->where('type', 'multiple_choice')
             ->select('quiz_level')
             ->distinct()
+            ->orderBy('quiz_level')
             ->pluck('quiz_level')
             ->toArray();
 
