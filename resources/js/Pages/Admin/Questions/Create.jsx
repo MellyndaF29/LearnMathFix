@@ -1,6 +1,5 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
 
 function FormField({ label, error, children }) {
     return (
@@ -18,6 +17,8 @@ const inputStyle = {
     color: 'white',
     outline: 'none',
 };
+
+const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 export default function CreateQuestion({ topic }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -38,13 +39,17 @@ export default function CreateQuestion({ topic }) {
     }
 
     function addOption() {
-        setData('options', [...data.options, '']);
+        if (data.options.length < labels.length) {
+            setData('options', [...data.options, '']);
+        }
     }
 
     function removeOption(index) {
+        if (data.options.length <= 2) return;
+        const removed = data.options[index];
         const newOptions = data.options.filter((_, i) => i !== index);
         setData('options', newOptions);
-        if (data.correct_answer === data.options[index]) {
+        if (data.correct_answer === removed || data.correct_answer === labels[index]) {
             setData('correct_answer', '');
         }
     }
@@ -61,7 +66,7 @@ export default function CreateQuestion({ topic }) {
             <Head title={`Tambah Soal — ${topic.title}`} />
 
             <div className="mb-8">
-                <Link href={route('admin.questions', topic.id)} className="text-white/40 hover:text-white/70 text-sm no-underline transition-colors">← Kembali</Link>
+                <Link href={route('admin.questions', topic.id)} className="text-white/40 hover:text-white/70 text-sm no-underline transition-colors">← Kembali ke Daftar Soal</Link>
                 <h1 className="font-cinzel text-2xl font-bold text-white mt-1">
                     Tambah Soal — <span className="text-bronze-light">{topic.title}</span>
                 </h1>
@@ -89,44 +94,79 @@ export default function CreateQuestion({ topic }) {
                     </FormField>
 
                     <div>
-                        <label className="text-sm font-semibold text-white/70 block mb-2">Pilihan Jawaban *</label>
-                        {errors.options && <p className="text-xs text-red-400 mb-2">{errors.options}</p>}
-                        <div className="flex flex-col gap-2">
-                            {data.options.map((opt, index) => (
-                                <div key={index} className="flex items-center gap-2">
-                                    <input
-                                        id={`option-${index}`}
-                                        type="text"
-                                        placeholder={`Pilihan ${index + 1}`}
-                                        value={opt}
-                                        onChange={e => setOption(index, e.target.value)}
-                                        className="flex-1 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/25 transition-all"
-                                        style={inputStyle}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => removeOption(index)}
-                                        disabled={data.options.length <= 2}
-                                        className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold transition-all disabled:opacity-30"
-                                        style={{ background: 'rgba(255,50,50,0.1)', color: '#ff6060', border: '1px solid rgba(255,50,50,0.2)' }}
-                                    >
-                                        ×
-                                    </button>
-                                </div>
-                            ))}
+                        <div className="flex items-center justify-between mb-2">
+                            <label className="text-sm font-semibold text-white/70">Pilihan Jawaban (Klik untuk memilih kunci) *</label>
+                            <span className="text-xs text-white/40">Minimal 2 pilihan</span>
                         </div>
-                        <button
-                            id="add-option-btn"
-                            type="button"
-                            onClick={addOption}
-                            className="mt-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
-                            style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
-                        >
-                            + Tambah Pilihan
-                        </button>
+                        {errors.options && <p className="text-xs text-red-400 mb-2">{errors.options}</p>}
+                        {errors.correct_answer && <p className="text-xs text-red-400 mb-2">{errors.correct_answer}</p>}
+                        <div className="flex flex-col gap-2">
+                            {data.options.map((opt, index) => {
+                                const label = labels[index] ?? String(index);
+                                const isCorrect = (data.correct_answer === opt && opt.trim() !== '') || data.correct_answer === label;
+                                return (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-2 p-1.5 rounded-xl transition-all"
+                                        style={{
+                                            background: isCorrect ? 'rgba(52,211,153,0.1)' : 'transparent',
+                                            border: isCorrect ? '1px solid rgba(52,211,153,0.35)' : '1px solid transparent',
+                                        }}
+                                    >
+                                        <button
+                                            type="button"
+                                            onClick={() => setData('correct_answer', opt || label)}
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs flex-shrink-0 transition-all"
+                                            title="Tandai sebagai kunci benar"
+                                            style={{
+                                                background: isCorrect ? '#34d399' : 'rgba(255,255,255,0.08)',
+                                                color: isCorrect ? '#081436' : 'rgba(255,255,255,0.6)',
+                                            }}
+                                        >
+                                            {isCorrect ? '✓ ' + label : label}
+                                        </button>
+                                        <input
+                                            id={`option-${index}`}
+                                            type="text"
+                                            placeholder={`Pilihan ${label}`}
+                                            value={opt}
+                                            onChange={e => {
+                                                const oldVal = opt;
+                                                setOption(index, e.target.value);
+                                                if (data.correct_answer === oldVal) {
+                                                    setData('correct_answer', e.target.value);
+                                                }
+                                            }}
+                                            className="flex-1 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/25 transition-all outline-none"
+                                            style={inputStyle}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeOption(index)}
+                                            disabled={data.options.length <= 2}
+                                            className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center text-sm font-bold transition-all disabled:opacity-30"
+                                            style={{ background: 'rgba(255,50,50,0.1)', color: '#ff6060', border: '1px solid rgba(255,50,50,0.2)' }}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {data.options.length < labels.length && (
+                            <button
+                                id="add-option-btn"
+                                type="button"
+                                onClick={addOption}
+                                className="mt-2 text-xs font-bold px-3 py-1.5 rounded-lg transition-all"
+                                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}
+                            >
+                                + Tambah Pilihan
+                            </button>
+                        )}
                     </div>
 
-                    <FormField label="Jawaban Benar *" error={errors.correct_answer}>
+                    <FormField label="Kunci Jawaban Benar *" error={errors.correct_answer}>
                         <select
                             id="correct-answer"
                             value={data.correct_answer}
@@ -135,9 +175,14 @@ export default function CreateQuestion({ topic }) {
                             style={inputStyle}
                         >
                             <option value="">-- Pilih Jawaban Benar --</option>
-                            {data.options.filter(o => o.trim()).map((opt, index) => (
-                                <option key={index} value={opt}>{opt}</option>
-                            ))}
+                            {data.options.map((opt, index) => {
+                                const label = labels[index] ?? String(index);
+                                return (
+                                    <option key={index} value={opt || label}>
+                                        {label}: {opt || `(Pilihan ${label})`}
+                                    </option>
+                                );
+                            })}
                         </select>
                     </FormField>
 
@@ -153,11 +198,12 @@ export default function CreateQuestion({ topic }) {
                         />
                     </FormField>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <FormField label="Tipe Soal *" error={errors.type}>
                             <select id="question-type" value={data.type} onChange={e => setData('type', e.target.value)} className={inputClass} style={inputStyle}>
-                                <option value="multiple_choice">Pilihan Ganda</option>
-                                <option value="true_false">Benar/Salah</option>
+                                <option value="multiple_choice">Pilihan Ganda (Kuis)</option>
+                                <option value="true_false">Benar/Salah (Kuis)</option>
+                                <option value="game">Game Jelajah</option>
                             </select>
                         </FormField>
 
@@ -169,17 +215,18 @@ export default function CreateQuestion({ topic }) {
                             </select>
                         </FormField>
 
-                        <FormField label="Level Kuis *" error={errors.quiz_level}>
-                            <input
+                        <FormField label="Tahap Kuis *" error={errors.quiz_level}>
+                            <select
                                 id="question-quiz-level"
-                                type="number"
-                                min={1}
-                                max={3}
                                 value={data.quiz_level}
                                 onChange={e => setData('quiz_level', parseInt(e.target.value) || 1)}
                                 className={inputClass}
                                 style={inputStyle}
-                            />
+                            >
+                                <option value={1}>Tahap 1 (Konsep Dasar)</option>
+                                <option value={2}>Tahap 2 (Latihan Penerapan)</option>
+                                <option value={3}>Tahap 3 (Soal Tantangan)</option>
+                            </select>
                         </FormField>
 
                         <FormField label="Urutan" error={errors.order}>

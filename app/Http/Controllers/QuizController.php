@@ -33,7 +33,7 @@ class QuizController extends Controller
         }
 
         $questions = $topic->questions()
-            ->where('type', 'multiple_choice')
+            ->where('type', '!=', 'game')
             ->where('quiz_level', $currentLevel)
             ->inRandomOrder()
             ->take(5)

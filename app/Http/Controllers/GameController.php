@@ -68,17 +68,42 @@ class GameController extends Controller
         $questions = collect();
 
         if ($stage === 5) {
-            // Stage 5 is the final mixed summit: pick 9 random questions from all topics
-            $questions = Question::where('type', 'multiple_choice')
-                ->inRandomOrder()
-                ->take(9)
-                ->get()
-                ->map(fn (Question $q) => [
-                    'id' => $q->id,
-                    'questionText' => $q->question_text,
-                    'options' => $q->options,
-                    'correctAnswer' => $q->correct_answer,
-                ]);
+            // Stage 5 is the final mixed summit: prioritize game questions, fallback to multiple_choice
+            $stage5Topic = Topic::where('order', 5)->first();
+            $gameQuestions = collect();
+
+            if ($stage5Topic) {
+                $gameQuestions = $stage5Topic->questions()->where('type', 'game')->inRandomOrder()->take(9)->get();
+            }
+
+            if ($gameQuestions->isEmpty()) {
+                $gameQuestions = Question::where('type', 'game')
+                    ->where('quiz_level', 5)
+                    ->inRandomOrder()
+                    ->take(9)
+                    ->get();
+            }
+
+            if ($gameQuestions->isEmpty()) {
+                $gameQuestions = Question::where('type', 'game')
+                    ->inRandomOrder()
+                    ->take(9)
+                    ->get();
+            }
+
+            if ($gameQuestions->isEmpty()) {
+                $gameQuestions = Question::where('type', 'multiple_choice')
+                    ->inRandomOrder()
+                    ->take(9)
+                    ->get();
+            }
+
+            $questions = $gameQuestions->map(fn (Question $q) => [
+                'id' => $q->id,
+                'questionText' => $q->question_text,
+                'options' => $q->options,
+                'correctAnswer' => $q->correct_answer,
+            ]);
         } else {
             $topicForStage = Topic::where('order', $stage)->where('is_published', true)->first();
 

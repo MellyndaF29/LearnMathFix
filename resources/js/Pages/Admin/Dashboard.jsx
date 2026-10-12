@@ -46,24 +46,24 @@ export default function AdminDashboard({ stats, recentUsers }) {
             </div>
 
             {/* Stat Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4 mb-10">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10">
                 <StatCard icon="👥" label="Total Pengguna"    value={stats.totalUsers}     accent="#8fb4ff" />
                 <StatCard icon="📚" label="Total Topik"       value={stats.totalTopics}    accent="#c9a45c" />
-                <StatCard icon="📄" label="Total Materi"      value={stats.totalSections}  accent="#2f9461" />
-                <StatCard icon="❓" label="Total Soal"        value={stats.totalQuestions} accent="#a78bfa" />
-                <StatCard icon="✅" label="Topik Dipublikasi" value={stats.publishedTopics} accent="#34d399" />
-                <StatCard icon="📝" label="Percobaan Kuis"   value={stats.quizAttempts}   accent="#fb923c" />
+                <StatCard icon="📝" label="Soal Kuis 3 Tahap" value={stats.quizQuestions ?? stats.totalQuestions} accent="#34d399" />
+                <StatCard icon="🗺️" label="Soal Game Jelajah" value={stats.gameQuestions ?? 0} accent="#f59e0b" />
             </div>
 
             {/* Quick Access */}
             <h2 className="font-cinzel text-base text-white/70 mb-4 font-bold uppercase tracking-wider">
                 Akses Cepat
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
                 {[
-                    { label: 'Tambah Akun Pembeli', href: route('admin.users.create'), icon: '➕', desc: 'Buat akun langsung aktif untuk pembeli baru.', highlight: true },
+                    { label: 'Kuis 3 Tahap',        href: route('admin.quiz'),         icon: '📝', desc: 'Kelola dan edit soal kuis berjenjang Level 1, 2, dan 3.', highlight: true },
+                    { label: 'Game Penjelajahan',   href: route('admin.game'),         icon: '🗺️', desc: 'Kelola dan edit soal untuk 5 Peta Petualangan Game Jelajah.', highlight: true },
+                    { label: 'Tambah Akun Pembeli', href: route('admin.users.create'), icon: '➕', desc: 'Buat akun langsung aktif untuk pembeli baru.' },
                     { label: 'Kelola Pengguna',     href: route('admin.users'),        icon: '👥', desc: 'Daftar semua pengguna dan atur hak akses admin.' },
-                    { label: 'Kelola Topik',        href: route('admin.topics'),       icon: '📚', desc: 'Tambah, ubah, atau hapus topik materi.' },
+                    { label: 'Kelola Topik',        href: route('admin.topics'),       icon: '📚', desc: 'Tambah, ubah, atau hapus topik materi pembelajaran.' },
                     { label: 'Kembali ke App',      href: route('dashboard'),          icon: '🏠', desc: 'Buka tampilan pengguna biasa.' },
                 ].map((item) => (
                     <Link

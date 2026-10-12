@@ -1,9 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
 
 const adminNavItems = [
-    { name: 'Dashboard',  href: route('admin.dashboard'), icon: '📊', match: '/admin', exact: true },
-    { name: 'Pengguna',   href: route('admin.users'),     icon: '👥', match: '/admin/users' },
-    { name: 'Topik',      href: route('admin.topics'),    icon: '📚', match: '/admin/topics' },
+    { name: 'Dashboard',    href: route('admin.dashboard'), icon: '📊', match: '/admin', exact: true },
+    { name: 'Pengguna',     href: route('admin.users'),     icon: '👥', match: '/admin/users' },
+    { name: 'Topik',        href: route('admin.topics'),    icon: '📚', match: '/admin/topics' },
+    { name: 'Kuis 3 Tahap', href: route('admin.quiz'),      icon: '📝', match: '/admin/kuis' },
+    { name: 'Game Jelajah', href: route('admin.game'),      icon: '🗺️', match: '/admin/game' },
 ];
 
 export default function AdminLayout({ children }) {

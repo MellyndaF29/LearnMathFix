@@ -91,6 +91,17 @@ Route::middleware(['auth', 'verified', 'is_admin'])->prefix('admin')->name('admi
     Route::get('/topics/{topic:id}/questions/{question:id}/edit', [AdminController::class, 'editQuestion'])->name('questions.edit');
     Route::put('/topics/{topic:id}/questions/{question:id}', [AdminController::class, 'updateQuestion'])->name('questions.update');
     Route::delete('/topics/{topic:id}/questions/{question:id}', [AdminController::class, 'destroyQuestion'])->name('questions.destroy');
+
+    // Kuis 3 Tahap
+    Route::get('/kuis', [AdminController::class, 'quizQuestions'])->name('quiz');
+
+    // Game Penjelajahan
+    Route::get('/game', [AdminController::class, 'gameQuestions'])->name('game');
+    Route::get('/game/questions/create', [AdminController::class, 'createGameQuestion'])->name('game.questions.create');
+    Route::post('/game/questions', [AdminController::class, 'storeGameQuestion'])->name('game.questions.store');
+    Route::get('/game/questions/{question:id}/edit', [AdminController::class, 'editGameQuestion'])->name('game.questions.edit');
+    Route::put('/game/questions/{question:id}', [AdminController::class, 'updateGameQuestion'])->name('game.questions.update');
+    Route::delete('/game/questions/{question:id}', [AdminController::class, 'destroyGameQuestion'])->name('game.questions.destroy');
 });
 
 require __DIR__.'/auth.php';
