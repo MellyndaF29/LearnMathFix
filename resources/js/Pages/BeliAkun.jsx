@@ -78,19 +78,25 @@ export default function BeliAkun({ auth }) {
                         <p className="text-xs text-white/40 text-center font-semibold uppercase tracking-widest mb-3">
                             Hubungi Admin Sekarang
                         </p>
-                        <a href="https://wa.me/6281234567890"
+                        <a href="https://wa.me/6282338487551"
                            target="_blank"
                            rel="noopener noreferrer"
-                           className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 no-underline"
+                           className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 no-underline shadow-lg"
                            style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)', color: '#fff' }}>
                             <span className="text-lg">📱</span>
-                            Hubungi via WhatsApp
+                            <div className="flex flex-col items-center leading-tight">
+                                <span>Hubungi via WhatsApp</span>
+                                <span className="text-[11px] font-normal opacity-90">+62 823-3848-7551</span>
+                            </div>
                         </a>
-                        <a href="mailto:admin@learnmath.id"
+                        <a href="mailto:mellyndafrdti04@gmail.com"
                            className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5 no-underline"
-                           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                           style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.12)' }}>
                             <span className="text-lg">✉️</span>
-                            Kirim Email
+                            <div className="flex flex-col items-center leading-tight">
+                                <span>Kirim Email</span>
+                                <span className="text-[11px] font-normal text-white/50">mellyndafrdti04@gmail.com</span>
+                            </div>
                         </a>
                     </div>
 
