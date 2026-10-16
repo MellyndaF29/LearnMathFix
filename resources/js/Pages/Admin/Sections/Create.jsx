@@ -1,5 +1,7 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 function FormField({ label, error, children }) {
     return (
@@ -18,7 +20,21 @@ const inputStyle = {
     outline: 'none',
 };
 
+
+const quillModules = {
+    toolbar: [
+        [{ header: [2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['blockquote', 'code-block'],
+        ['clean'],
+    ],
+};
+
+const quillFormats = ['header', 'bold', 'italic', 'underline', 'list', 'blockquote', 'code-block'];
+
 export default function CreateSection({ topic }) {
+
     const { data, setData, post, processing, errors } = useForm({
         title: '',
         content: '',
@@ -94,15 +110,16 @@ export default function CreateSection({ topic }) {
                     </FormField>
 
                     <FormField label="Konten *" error={errors.content}>
-                        <textarea
-                            id="section-content"
-                            rows={10}
-                            placeholder="Tulis konten materi di sini..."
-                            value={data.content}
-                            onChange={e => setData('content', e.target.value)}
-                            className={inputClass}
-                            style={{ ...inputStyle, resize: 'vertical' }}
-                        />
+                        <div id="section-content-editor" className="quill-wrapper">
+                            <ReactQuill
+                                theme="snow"
+                                value={data.content}
+                                onChange={value => setData('content', value)}
+                                modules={quillModules}
+                                formats={quillFormats}
+                                placeholder="Tulis konten materi di sini..."
+                            />
+                        </div>
                     </FormField>
 
                     <div className="flex items-center gap-3 pt-2">

@@ -1,5 +1,19 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
+const quillModules = {
+    toolbar: [
+        [{ header: [2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['blockquote', 'code-block'],
+        ['clean'],
+    ],
+};
+
+const quillFormats = ['header', 'bold', 'italic', 'underline', 'list', 'blockquote', 'code-block'];
 
 function FormField({ label, error, children }) {
     return (
@@ -69,14 +83,15 @@ export default function EditSection({ topic, section }) {
                     </FormField>
 
                     <FormField label="Konten *" error={errors.content}>
-                        <textarea
-                            id="section-content"
-                            rows={10}
-                            value={data.content}
-                            onChange={e => setData('content', e.target.value)}
-                            className={inputClass}
-                            style={{ ...inputStyle, resize: 'vertical' }}
-                        />
+                        <div id="section-content-editor" className="quill-wrapper">
+                            <ReactQuill
+                                theme="snow"
+                                value={data.content}
+                                onChange={value => setData('content', value)}
+                                modules={quillModules}
+                                formats={quillFormats}
+                            />
+                        </div>
                     </FormField>
 
                     <div className="flex items-center gap-3 pt-2">
